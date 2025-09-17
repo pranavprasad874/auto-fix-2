@@ -378,20 +378,26 @@
 
 
 			<main class="app-main">
-    <div id="update-main-view">
-        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <a href="javascript:void(0)" onclick="showUpdateSubView('pending-jobs-view')" class="card text-center items-center flex flex-col justify-center p-6 transition-all hover:shadow-xl hover:-translate-y-1">
-                <span class="material-symbols-outlined text-5xl text-[var(--primary-color)]">pending_actions</span>
-                <h2 class="text-lg font-bold mt-2">Pending Jobs</h2>
-                <p class="text-sm text-[var(--text-secondary)]">View jobs that are not started</p>
-            </a>
-            <a href="javascript:void(0)" onclick="showUpdateSubView('customer-response-view')" class="card text-center items-center flex flex-col justify-center p-6 transition-all hover:shadow-xl hover:-translate-y-1">
-                <span class="material-symbols-outlined text-5xl text-green-600">rate_review</span>
-                <h2 class="text-lg font-bold mt-2">Customer Responses</h2>
-                <p class="text-sm text-[var(--text-secondary)]">Act on received approvals</p>
-            </a>
-        </div>
+<div id="update-main-view" class="space-y-4">
+    <div class="card relative">
+        <h2 class="text-xl font-bold mb-4">Search Report to Update</h2>
+        <input id="update-search-input" type="text" placeholder="Start typing vehicle number..." class="form-input" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" onkeyup="handleReportUpdateSearch()">
+        <div id="prediction-list" class="absolute top-full left-5 right-5 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden"></div>
     </div>
+
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <a href="javascript:void(0)" onclick="showUpdateSubView('pending-jobs-view')" class="card text-center items-center flex flex-col justify-center p-6 transition-all hover:shadow-xl hover:-translate-y-1">
+            <span class="material-symbols-outlined text-5xl text-[var(--primary-color)]">pending_actions</span>
+            <h2 class="text-lg font-bold mt-2">Pending Jobs</h2>
+            <p class="text-sm text-[var(--text-secondary)]">View jobs that are not started</p>
+        </a>
+        <a href="javascript:void(0)" onclick="showUpdateSubView('customer-response-view')" class="card text-center items-center flex flex-col justify-center p-6 transition-all hover:shadow-xl hover:-translate-y-1">
+            <span class="material-symbols-outlined text-5xl text-green-600">rate_review</span>
+            <h2 class="text-lg font-bold mt-2">Customer Responses</h2>
+            <p class="text-sm text-[var(--text-secondary)]">Act on received approvals</p>
+        </a>
+    </div>
+</div>
 
     <div id="pending-jobs-view" class="update-sub-view hidden">
         <div class="card">
@@ -2865,6 +2871,7 @@ function showExecutiveScreen(screenId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
