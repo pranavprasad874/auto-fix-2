@@ -2418,6 +2418,9 @@ function resetVehicleUpdateScreen() {
     currentReportId = null;
     renderSuggestions();
     renderMaterials();
+
+    document.getElementById('send-whatsapp-btn').classList.remove('hidden');
+
 }
 
         // --- Damage Marking Functions ---
@@ -2942,6 +2945,7 @@ async function loadApprovalScreen(reportId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
