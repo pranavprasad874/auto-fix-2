@@ -1786,80 +1786,7 @@
             predictionList.classList.remove('hidden');
         }
 
-        function selectReportForUpdate(report) {
-    		document.getElementById('pending-jobs-card').classList.add('hidden'); // ADD THIS LINE
-		    currentReportId = report.id;
-            document.getElementById('update-search-input').value = report.vehicles.vehicle_no;
-            predictionList.classList.add('hidden');
-            document.getElementById('update-detail-number').textContent = report.vehicles.vehicle_no;
-            updateDetailsSection.classList.remove('hidden');
-            updateFormSection.classList.remove('hidden');
 
-            try {
-                originalComplaintsForUpdate = JSON.parse(report.complaint || '[]');
-            } catch (e) {
-                console.error("Could not parse complaints:", e);
-                originalComplaintsForUpdate = [];
-            }
-             try {
-                newSuggestions = report.suggested ? JSON.parse(report.suggested) : [];
-            } catch(e) {
-                console.error("Could not parse suggestions:", e);
-                newSuggestions = [];
-            }
-            requiredMaterials = [];
-            
-            const complaintDisplayList = document.getElementById('original-complaints-list');
-            const complaintSummaryP = document.getElementById('update-detail-complaint');
-            const complaintDisplayDiv = document.getElementById('original-complaints-display');
-            complaintDisplayList.innerHTML = '';
-            
-            if (originalComplaintsForUpdate.length > 0) {
-                complaintSummaryP.textContent = `${originalComplaintsForUpdate.length} issue(s) registered.`;
-                originalComplaintsForUpdate.forEach(complaint => {
-                    const li = document.createElement('li');
-                    li.textContent = complaint;
-                    complaintDisplayList.appendChild(li);
-                });
-                complaintDisplayDiv.classList.remove('hidden');
-            } else {
-                 complaintSummaryP.textContent = 'No complaints registered.';
-                 complaintDisplayDiv.classList.add('hidden');
-            }
-
-            // Display customer feedback if available
-            const feedbackDisplay = document.getElementById('customer-feedback-display');
-            const feedbackTextDisplay = document.getElementById('customer-feedback-text-display');
-            const feedbackAudioDisplay = document.getElementById('customer-feedback-audio-display');
-
-            // Reset visibility and content first
-            feedbackDisplay.classList.add('hidden');
-            feedbackTextDisplay.classList.add('hidden');
-            feedbackAudioDisplay.classList.add('hidden');
-            feedbackTextDisplay.textContent = '';
-            feedbackAudioDisplay.innerHTML = '';
-
-            if (report.customer_feedback_text || report.customer_feedback_audio) {
-                feedbackDisplay.classList.remove('hidden');
-
-                if (report.customer_feedback_text) {
-                    feedbackTextDisplay.textContent = report.customer_feedback_text;
-                    feedbackTextDisplay.classList.remove('hidden');
-                }
-
-                if (report.customer_feedback_audio) {
-                    feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
-                    feedbackAudioDisplay.classList.remove('hidden');
-                }
-            }
-
-            const approvedItems = report.approved ? JSON.parse(report.approved) : [];
-            renderSuggestions(approvedItems);
-            renderMaterials();
-
-            const today = new Date().toISOString().split('T')[0];
-            document.getElementById('delivery-date').setAttribute('min', today);
-        }
         
         function addSuggestion() {
             const input = document.getElementById('suggestion-input');
@@ -2059,6 +1986,71 @@ async function populateNotStartedJobs() {
         listContainer.appendChild(card);
     });
 }
+
+		// ADD THIS NEW FUNCTION
+function showUpdateSubView(viewId) {
+    // Hide all main views within the update screen
+    document.getElementById('update-main-view').classList.add('hidden');
+    document.querySelectorAll('.update-sub-view').forEach(v => v.classList.add('hidden'));
+
+    // Show the requested view
+    const viewToShow = document.getElementById(viewId);
+    if (viewToShow) {
+        viewToShow.classList.remove('hidden');
+    }
+    
+    // Populate the list when its view is shown
+    if (viewId === 'pending-jobs-view') {
+        populateNotStartedJobs();
+    }
+    if (viewId === 'customer-response-view') {
+        populateCustomerResponseJobs();
+    }
+}
+
+// ADD THIS NEW FUNCTION
+async function populateCustomerResponseJobs() {
+    const listContainer = document.getElementById('customer-response-list');
+    const noJobsMsg = document.getElementById('no-customer-response-message');
+    listContainer.innerHTML = '';
+    noJobsMsg.classList.add('hidden');
+
+    // Fetch ongoing reports where the 'approved' field has been populated by a customer
+    const { data: reports, error } = await sb.from('reports')
+        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand))`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'Ongoing')
+        .not('approved', 'is', null) // Key filter: finds jobs with responses
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching customer response jobs:", error);
+        return showError('Could not fetch jobs with customer responses.');
+    }
+
+    if (!reports || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        const approvedCount = (JSON.parse(report.approved || '[]')).length;
+
+        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-green-500 cursor-pointer transition-all flex justify-between items-center';
+        card.innerHTML = `
+            <div>
+                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                <p class="text-sm text-green-700 font-semibold">${approvedCount} service(s) approved</p>
+            </div>
+            <span class="material-symbols-outlined text-gray-400">chevron_right</span>
+        `;
+        card.onclick = () => selectReportForUpdate(report);
+        listContainer.appendChild(card);
+    });
+}
+
+		
 
 		
         // --- EXECUTIVE: DUE DATES ---
@@ -2271,23 +2263,101 @@ async function populateNotStartedJobs() {
             document.getElementById('recording-status').textContent = '';
         }
 
-        function resetVehicleUpdateScreen() {
-            document.getElementById('update-search-input').value = '';
-            predictionList.classList.add('hidden');
-            updateDetailsSection.classList.add('hidden');
-            updateFormSection.classList.add('hidden');
-            document.getElementById('delivery-date').value = '';
-            newSuggestions = [];
-            requiredMaterials = [];
-            currentReportId = null;
-            renderSuggestions();
-            renderMaterials();
+// REPLACE the existing selectReportForUpdate function
+function selectReportForUpdate(report) {
+    // Hide the main dashboard and list views
+    document.getElementById('update-main-view').classList.add('hidden');
+    document.querySelectorAll('.update-sub-view').forEach(v => v.classList.add('hidden'));
 
-		const pendingJobsCard = document.getElementById('pending-jobs-card');
-    	if (pendingJobsCard) {
-        	pendingJobsCard.classList.remove('hidden');
-    		}
+    currentReportId = report.id;
+    document.getElementById('update-search-input').value = report.vehicles.vehicle_no;
+    predictionList.classList.add('hidden');
+    document.getElementById('update-detail-number').textContent = report.vehicles.vehicle_no;
+    updateDetailsSection.classList.remove('hidden');
+    updateFormSection.classList.remove('hidden');
+
+    try {
+        originalComplaintsForUpdate = JSON.parse(report.complaint || '[]');
+    } catch (e) {
+        console.error("Could not parse complaints:", e);
+        originalComplaintsForUpdate = [];
+    }
+     try {
+        newSuggestions = report.suggested ? JSON.parse(report.suggested) : [];
+    } catch(e) {
+        console.error("Could not parse suggestions:", e);
+        newSuggestions = [];
+    }
+    requiredMaterials = [];
+    
+    const complaintDisplayList = document.getElementById('original-complaints-list');
+    const complaintSummaryP = document.getElementById('update-detail-complaint');
+    const complaintDisplayDiv = document.getElementById('original-complaints-display');
+    complaintDisplayList.innerHTML = '';
+    
+    if (originalComplaintsForUpdate.length > 0) {
+        complaintSummaryP.textContent = `${originalComplaintsForUpdate.length} issue(s) registered.`;
+        originalComplaintsForUpdate.forEach(complaint => {
+            const li = document.createElement('li');
+            li.textContent = complaint;
+            complaintDisplayList.appendChild(li);
+        });
+        complaintDisplayDiv.classList.remove('hidden');
+    } else {
+         complaintSummaryP.textContent = 'No complaints registered.';
+         complaintDisplayDiv.classList.add('hidden');
+    }
+
+    const feedbackDisplay = document.getElementById('customer-feedback-display');
+    const feedbackTextDisplay = document.getElementById('customer-feedback-text-display');
+    const feedbackAudioDisplay = document.getElementById('customer-feedback-audio-display');
+
+    feedbackDisplay.classList.add('hidden');
+    feedbackTextDisplay.classList.add('hidden');
+    feedbackAudioDisplay.classList.add('hidden');
+    feedbackTextDisplay.textContent = '';
+    feedbackAudioDisplay.innerHTML = '';
+
+    if (report.customer_feedback_text || report.customer_feedback_audio) {
+        feedbackDisplay.classList.remove('hidden');
+        if (report.customer_feedback_text) {
+            feedbackTextDisplay.textContent = report.customer_feedback_text;
+            feedbackTextDisplay.classList.remove('hidden');
         }
+        if (report.customer_feedback_audio) {
+            feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
+            feedbackAudioDisplay.classList.remove('hidden');
+        }
+    }
+
+    const approvedItems = report.approved ? JSON.parse(report.approved) : [];
+    renderSuggestions(approvedItems);
+    renderMaterials();
+
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('delivery-date').setAttribute('min', today);
+}
+
+// REPLACE the existing resetVehicleUpdateScreen function
+function resetVehicleUpdateScreen() {
+    // Hide update form and sub-views
+    document.getElementById('update-details-section').classList.add('hidden');
+    document.getElementById('update-form-section').classList.add('hidden');
+    document.querySelectorAll('.update-sub-view').forEach(v => v.classList.add('hidden'));
+
+    // Show the main dashboard view
+    document.getElementById('update-main-view').classList.remove('hidden');
+
+    // Clear old data
+    document.getElementById('update-search-input').value = '';
+    predictionList.classList.add('hidden');
+    document.getElementById('delivery-date').value = '';
+    newSuggestions = [];
+    requiredMaterials = [];
+    currentReportId = null;
+    renderSuggestions();
+    renderMaterials();
+}
 
         // --- Damage Marking Functions ---
         function resizeCanvas() {
@@ -2795,6 +2865,7 @@ function showExecutiveScreen(screenId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
