@@ -2626,48 +2626,64 @@ function showExecutiveScreen(screenId) {
         }
 
         // --- Customer Approval Flow ---
-        async function loadApprovalScreen(reportId) {
-            document.getElementById('login-screen').style.display = 'none';
-            document.getElementById('admin-screens').style.display = 'none';
-            document.getElementById('executive-screens').style.display = 'none';
-            document.getElementById('customer-approval-screen').classList.add('active-screen');
+async function loadApprovalScreen(reportId) {
+    document.getElementById('login-screen').style.display = 'none';
+    document.getElementById('admin-screens').style.display = 'none';
+    document.getElementById('executive-screens').style.display = 'none';
+    document.getElementById('customer-approval-screen').classList.add('active-screen');
 
-            const { data: report, error } = await sb.from('reports')
-                .select(`suggested, vehicles ( vehicle_no )`)
-                .eq('id', reportId)
-                .single();
+    // 1. MODIFIED QUERY: Now also fetches the 'approved' status
+    const { data: report, error } = await sb.from('reports')
+        .select(`suggested, approved, vehicles ( vehicle_no )`)
+        .eq('id', reportId)
+        .single();
 
-            if (error || !report) {
-                console.error('Error fetching report for approval:', error);
-                showError('Could not load the approval details. The link may be invalid.');
-                document.getElementById('approval-content').innerHTML = '<p class="text-center text-red-600">Could not load report details.</p>';
-                return;
+    if (error || !report) {
+        console.error('Error fetching report for approval:', error);
+        showError('Could not load the approval details. The link may be invalid.');
+        document.getElementById('approval-content').innerHTML = '<p class="text-center text-red-600">Could not load report details.</p>';
+        return;
+    }
+
+    document.getElementById('approval-vehicle-no').textContent = report.vehicles.vehicle_no;
+
+    // 2. NEW LOGIC: Check if a response already exists
+    if (report.approved !== null) {
+        // If 'approved' is not null, a submission has already been made.
+        document.getElementById('approval-content').classList.add('hidden');
+        const successMsg = document.getElementById('approval-success-message');
+        
+        // Update the message to inform the user.
+        successMsg.querySelector('h3').textContent = 'Response Already Submitted';
+        successMsg.querySelector('p').textContent = 'Thank you, we have already received your feedback for this service request.';
+        
+        successMsg.classList.remove('hidden');
+        document.querySelector('#customer-approval-card h2').textContent = 'Response Received';
+    } else {
+        // If 'approved' is null, show the form as usual.
+        const suggestionsList = document.getElementById('approval-suggestions-list');
+        suggestionsList.innerHTML = '';
+        try {
+            const suggestions = JSON.parse(report.suggested || '[]');
+            if (suggestions.length > 0) {
+                suggestions.forEach(text => {
+                    const item = document.createElement('label');
+                    item.className = 'flex items-center gap-3 p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors';
+                    item.innerHTML = `
+                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="${text}">
+                        <span class="flex-1 text-sm font-medium">${text}</span>
+                    `;
+                    suggestionsList.appendChild(item);
+                });
+            } else {
+                suggestionsList.innerHTML = '<p class="text-sm text-gray-500">No specific repairs were suggested.</p>';
             }
-
-            document.getElementById('approval-vehicle-no').textContent = report.vehicles.vehicle_no;
-            const suggestionsList = document.getElementById('approval-suggestions-list');
-            suggestionsList.innerHTML = '';
-
-            try {
-                const suggestions = JSON.parse(report.suggested || '[]');
-                if (suggestions.length > 0) {
-                    suggestions.forEach(text => {
-                        const item = document.createElement('label');
-                        item.className = 'flex items-center gap-3 p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors';
-                        item.innerHTML = `
-                            <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="${text}">
-                            <span class="flex-1 text-sm font-medium">${text}</span>
-                        `;
-                        suggestionsList.appendChild(item);
-                    });
-                } else {
-                    suggestionsList.innerHTML = '<p class="text-sm text-gray-500">No specific repairs were suggested.</p>';
-                }
-            } catch(e) {
-                console.error("Error parsing suggestions:", e);
-                suggestionsList.innerHTML = '<p class="text-sm text-red-500">Could not display suggested repairs.</p>';
-            }
+        } catch (e) {
+            console.error("Error parsing suggestions:", e);
+            suggestionsList.innerHTML = '<p class="text-sm text-red-500">Could not display suggested repairs.</p>';
         }
+    }
+}
 
         async function submitCustomerFeedback() {
             const params = new URLSearchParams(window.location.search);
@@ -2916,6 +2932,7 @@ function showExecutiveScreen(screenId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
