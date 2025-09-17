@@ -379,7 +379,7 @@
                 <div class="card relative"><h2 class="text-xl font-bold mb-4">Search Report to Update</h2><input id="update-search-input" type="text" placeholder="Start typing vehicle number..." class="form-input" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" onkeyup="handleReportUpdateSearch()"><div id="prediction-list" class="absolute top-full left-5 right-5 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden"></div></div>
                 <div class="card">
     <h2 class="text-xl font-bold mb-4">Pending Job Cards (Not Started)</h2>
-    <div id="not-started-jobs-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <div id="not-started-jobs-list" class="space-y-3">
         </div>
     <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No pending job cards found.</p>
 </div>
@@ -2019,16 +2019,17 @@
             window.open(whatsappUrl, '_blank');
         }
 
-		// ADD THIS FUNCTION
+
+		// REPLACE the existing populateNotStartedJobs function with this one
 async function populateNotStartedJobs() {
     const listContainer = document.getElementById('not-started-jobs-list');
     const noJobsMsg = document.getElementById('no-pending-jobs-message');
     listContainer.innerHTML = '';
     noJobsMsg.classList.add('hidden');
 
-    // Fetch reports with "Not Started" status for the current executive
+    // Updated query to fetch vehicle_name, color, and brand
     const { data: reports, error } = await sb.from('reports')
-        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no)`)
+        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand))`)
         .eq('executive_id', currentUser.id)
         .eq('status', 'Not Started')
         .order('created_at', { ascending: false });
@@ -2044,15 +2045,31 @@ async function populateNotStartedJobs() {
         return;
     }
 
-    // Create a clickable card for each report
     reports.forEach(report => {
         const card = document.createElement('div');
-        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 cursor-pointer transition-all';
+        const vehicle = report.vehicles;
+
+        // Safely get vehicle details
+        const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+        const vehicleName = vehicle.vehicle_name || '';
+        const color = vehicle.color || '';
+
+        // Create a clean description string, filtering out empty parts
+        const descriptionParts = [vehicleName, brand, color].filter(part => part);
+        const description = descriptionParts.join(' &bull; '); // Using a bullet separator
+
+        // Updated card style for a list view
+        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 cursor-pointer transition-all flex justify-between items-center';
+
         card.innerHTML = `
-            <p class="font-bold text-lg text-gray-800">${report.vehicles.vehicle_no}</p>
-            <p class="text-sm text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}">${formatArrayCell(report.complaint)}</p>
+            <div>
+                <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+                <p class="text-sm text-gray-600">${description}</p>
+                <p class="text-xs text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
+            </div>
+            <span class="material-symbols-outlined text-gray-400">chevron_right</span>
         `;
-        // Clicking the card calls the existing function to populate the update form
+
         card.onclick = () => selectReportForUpdate(report);
         listContainer.appendChild(card);
     });
@@ -2788,5 +2805,6 @@ function showExecutiveScreen(screenId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
