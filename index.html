@@ -2389,14 +2389,14 @@ function selectReportForUpdate(report) {
     document.getElementById('delivery-date').setAttribute('min', today);
 
 	// ADD THIS LOGIC AT THE END OF THE FUNCTION
-    const whatsappButton = document.getElementById('send-whatsapp-btn');
-    if (report.approved !== null) {
-        // If a response has been received, hide the button.
-        whatsappButton.classList.add('hidden');
-    } else {
-        // Otherwise, make sure it's visible.
-        whatsappButton.classList.remove('hidden');
-    }
+const whatsappButton = document.getElementById('send-whatsapp-btn');
+if (report.approved !== null) {
+    // If a response has been received, forcefully hide the button.
+    whatsappButton.style.display = 'none';
+} else {
+    // Otherwise, make sure it's visible as a flex item.
+    whatsappButton.style.display = 'flex';
+}
 }
 
 // REPLACE the existing resetVehicleUpdateScreen function
@@ -2944,6 +2944,7 @@ async function loadApprovalScreen(reportId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
