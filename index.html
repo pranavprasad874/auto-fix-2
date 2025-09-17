@@ -2068,7 +2068,7 @@ async function populateCustomerResponseJobs() {
 
     // Fetch ongoing reports where the 'approved' field has been populated by a customer
     const { data: reports, error } = await sb.from('reports')
-        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand))`)
+        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
         .eq('executive_id', currentUser.id)
         .eq('status', 'Ongoing')
         .not('approved', 'is', null) // Key filter: finds jobs with responses
@@ -2089,13 +2089,20 @@ async function populateCustomerResponseJobs() {
         const approvedCount = (JSON.parse(report.approved || '[]')).length;
 
         card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-green-500 cursor-pointer transition-all flex justify-between items-center';
-        card.innerHTML = `
-            <div>
-                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
-                <p class="text-sm text-green-700 font-semibold">${approvedCount} service(s) approved</p>
-            </div>
-            <span class="material-symbols-outlined text-gray-400">chevron_right</span>
-        `;
+const vehicle = report.vehicles;
+const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
+
+card.innerHTML = `
+    <div class="flex-grow">
+        <div class="flex justify-between items-center">
+            <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+            <p class="text-xs text-gray-500 italic">${brand} ${model}</p>
+        </div>
+        <p class="text-sm text-green-700 font-semibold mt-1">${approvedCount} service(s) approved</p>
+    </div>
+    <span class="material-symbols-outlined text-gray-400 ml-2">chevron_right</span>
+`;
         card.onclick = () => selectReportForUpdate(report);
         listContainer.appendChild(card);
     });
@@ -2944,6 +2951,7 @@ async function loadApprovalScreen(reportId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
