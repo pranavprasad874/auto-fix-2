@@ -1992,7 +1992,7 @@ async function populateNotStartedJobs() {
 
     // Updated query to fetch vehicle_name, color, and brand
     const { data: reports, error } = await sb.from('reports')
-        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand))`)
+        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
         .eq('executive_id', currentUser.id)
         .eq('status', 'Not Started')
         .order('created_at', { ascending: false });
@@ -2010,28 +2010,31 @@ async function populateNotStartedJobs() {
 
     reports.forEach(report => {
         const card = document.createElement('div');
-        const vehicle = report.vehicles;
+const vehicle = report.vehicles;
 
-        // Safely get vehicle details
-        const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
-        const vehicleName = vehicle.vehicle_name || '';
-        const color = vehicle.color || '';
+// Safely get all vehicle details, now including the model
+const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
+const vehicleName = vehicle.vehicle_name || '';
+const color = vehicle.color || '';
 
-        // Create a clean description string, filtering out empty parts
-        const descriptionParts = [vehicleName, brand, color].filter(part => part);
-        const description = descriptionParts.join(' &bull; '); // Using a bullet separator
+// Create a new description string that combines brand and model
+const brandAndModel = `${brand} ${model}`.trim();
+const descriptionParts = [vehicleName, brandAndModel, color].filter(part => part);
+const description = descriptionParts.join(' &bull; '); // Using a bullet separator
 
-        // Updated card style for a list view
-        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 cursor-pointer transition-all flex justify-between items-center';
+// Card style remains the same
+card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 cursor-pointer transition-all flex justify-between items-center';
 
-        card.innerHTML = `
-            <div>
-                <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
-                <p class="text-sm text-gray-600">${description}</p>
-                <p class="text-xs text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
-            </div>
-            <span class="material-symbols-outlined text-gray-400">chevron_right</span>
-        `;
+// The innerHTML is updated with the new description
+card.innerHTML = `
+    <div>
+        <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+        <p class="text-sm text-gray-600">${description}</p>
+        <p class="text-xs text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
+    </div>
+    <span class="material-symbols-outlined text-gray-400">chevron_right</span>
+`;
 
         card.onclick = () => selectReportForUpdate(report);
         listContainer.appendChild(card);
@@ -2951,6 +2954,7 @@ async function loadApprovalScreen(reportId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
