@@ -377,7 +377,7 @@
         <div id="vehicle-update-screen" class="executive-screen" style="display: none;">
              <main class="app-main">
                 <div class="card relative"><h2 class="text-xl font-bold mb-4">Search Report to Update</h2><input id="update-search-input" type="text" placeholder="Start typing vehicle number..." class="form-input" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" onkeyup="handleReportUpdateSearch()"><div id="prediction-list" class="absolute top-full left-5 right-5 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden"></div></div>
-                <div class="card">
+                <div id="pending-jobs-card" class="card">
     <h2 class="text-xl font-bold mb-4">Pending Job Cards (Not Started)</h2>
     <div id="not-started-jobs-list" class="space-y-3">
         </div>
@@ -1803,7 +1803,8 @@
         }
 
         function selectReportForUpdate(report) {
-            currentReportId = report.id;
+    		document.getElementById('pending-jobs-card').classList.add('hidden'); // ADD THIS LINE
+		    currentReportId = report.id;
             document.getElementById('update-search-input').value = report.vehicles.vehicle_no;
             predictionList.classList.add('hidden');
             document.getElementById('update-detail-number').textContent = report.vehicles.vehicle_no;
@@ -2297,6 +2298,11 @@ async function populateNotStartedJobs() {
             currentReportId = null;
             renderSuggestions();
             renderMaterials();
+
+		const pendingJobsCard = document.getElementById('pending-jobs-card');
+    	if (pendingJobsCard) {
+        	pendingJobsCard.classList.remove('hidden');
+    		}
         }
 
         // --- Damage Marking Functions ---
@@ -2805,6 +2811,7 @@ function showExecutiveScreen(screenId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
