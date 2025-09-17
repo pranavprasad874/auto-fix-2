@@ -377,7 +377,13 @@
         <div id="vehicle-update-screen" class="executive-screen" style="display: none;">
              <main class="app-main">
                 <div class="card relative"><h2 class="text-xl font-bold mb-4">Search Report to Update</h2><input id="update-search-input" type="text" placeholder="Start typing vehicle number..." class="form-input" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, '')" onkeyup="handleReportUpdateSearch()"><div id="prediction-list" class="absolute top-full left-5 right-5 mt-1 bg-white border border-gray-200 rounded-lg shadow-lg z-10 hidden"></div></div>
-                <div id="update-details-section" class="card hidden space-y-4">
+                <div class="card">
+    <h2 class="text-xl font-bold mb-4">Pending Job Cards (Not Started)</h2>
+    <div id="not-started-jobs-list" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        </div>
+    <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No pending job cards found.</p>
+</div>
+				 <div id="update-details-section" class="card hidden space-y-4">
                     <h2 class="text-xl font-bold flex items-center gap-2 text-green-600"><span class="material-symbols-outlined">check_circle</span> Selected Report</h2>
                     <div class="grid grid-cols-2 gap-4 text-base border-t pt-4">
                         <div><p class="font-medium text-[var(--text-secondary)]">Vehicle Number</p><p id="update-detail-number" class="font-bold text-lg"></p></div>
@@ -2013,6 +2019,46 @@
             window.open(whatsappUrl, '_blank');
         }
 
+		// ADD THIS FUNCTION
+async function populateNotStartedJobs() {
+    const listContainer = document.getElementById('not-started-jobs-list');
+    const noJobsMsg = document.getElementById('no-pending-jobs-message');
+    listContainer.innerHTML = '';
+    noJobsMsg.classList.add('hidden');
+
+    // Fetch reports with "Not Started" status for the current executive
+    const { data: reports, error } = await sb.from('reports')
+        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no)`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'Not Started')
+        .order('created_at', { ascending: false });
+
+    if (error) {
+        console.error("Error fetching not started jobs:", error);
+        showError('Could not fetch pending job cards.');
+        return;
+    }
+
+    if (!reports || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+
+    // Create a clickable card for each report
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 cursor-pointer transition-all';
+        card.innerHTML = `
+            <p class="font-bold text-lg text-gray-800">${report.vehicles.vehicle_no}</p>
+            <p class="text-sm text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}">${formatArrayCell(report.complaint)}</p>
+        `;
+        // Clicking the card calls the existing function to populate the update form
+        card.onclick = () => selectReportForUpdate(report);
+        listContainer.appendChild(card);
+    });
+}
+
+		
         // --- EXECUTIVE: DUE DATES ---
         async function populateDueDateScreen() {
             const listContainer = document.getElementById('due-date-list');
@@ -2324,19 +2370,24 @@
             showScreen('admin-screens');
         }
 
-        function showExecutiveScreen(screenId) {
-            document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
-            document.getElementById(screenId).style.display = 'block';
-            setActiveNav(screenId);
-            
-            if (screenId === 'report-screen') fetchAndPopulateReports(false);
-            if (screenId === 'due-date-screen') populateDueDateScreen();
-            if (screenId === 'job-card-screen') {
-                resetJobCardState();
-            }
-            
-            showScreen('executive-screens');
-        }
+
+function showExecutiveScreen(screenId) {
+    document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
+    document.getElementById(screenId).style.display = 'block';
+    setActiveNav(screenId);
+
+    if (screenId === 'report-screen') fetchAndPopulateReports(false);
+    if (screenId === 'due-date-screen') populateDueDateScreen();
+    if (screenId === 'job-card-screen') {
+        resetJobCardState();
+    }
+    if (screenId === 'vehicle-update-screen') {
+        resetVehicleUpdateScreen(); // First, clear any previous update state
+        populateNotStartedJobs();   // Then, populate the list of pending jobs
+    }
+
+    showScreen('executive-screens');
+}
 
         function setActiveNav(targetId) {
             const headerTitle = document.getElementById('executive-header-title');
@@ -2737,4 +2788,5 @@
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
