@@ -2759,25 +2759,27 @@ async function loadApprovalScreen(reportId) {
             document.getElementById('approval-success-message').classList.remove('hidden');
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            const params = new URLSearchParams(window.location.search);
-            const reportId = params.get('report_id');
+document.addEventListener('DOMContentLoaded', () => {
+    const params = new URLSearchParams(window.location.search);
+    const reportId = params.get('report_id');
 
-            if (reportId) {
-                loadApprovalScreen(reportId);
-            } else {
-                const savedUser = sessionStorage.getItem('currentUser');
-                if (savedUser) {
-                    currentUser = JSON.parse(savedUser);
-                    if (currentUser.role === 'admin') {
-                        showAdminScreen('admin-dashboard-screen');
-                    } else if (currentUser.role === 'executive') {
-                        document.getElementById('profile-username').textContent = currentUser.username;
-                        document.getElementById('profile-role').textContent = currentUser.role;
-                        showExecutiveScreen('job-card-screen');
-                    }
-                }
+    if (reportId) {
+        // If a report_id exists, it's a customer link. Load ONLY this and stop.
+        loadApprovalScreen(reportId);
+    } else {
+        // Otherwise, it's the main app. Proceed to check for a logged-in user.
+        const savedUser = sessionStorage.getItem('currentUser');
+        if (savedUser) {
+            currentUser = JSON.parse(savedUser);
+            if (currentUser.role === 'admin') {
+                showAdminScreen('admin-dashboard-screen');
+            } else if (currentUser.role === 'executive') {
+                document.getElementById('profile-username').textContent = currentUser.username;
+                document.getElementById('profile-role').textContent = currentUser.role;
+                showExecutiveScreen('job-card-screen');
             }
+        }
+    }
 
             carImage = document.getElementById("carImage");
             damageCanvas = document.getElementById("damageCanvas");
@@ -2954,6 +2956,7 @@ async function loadApprovalScreen(reportId) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
