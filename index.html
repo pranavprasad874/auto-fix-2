@@ -2320,7 +2320,7 @@ async function sendApprovalLink() {
     }
     
     // Step 4: Construct the WhatsApp message and URL, then open it.
-    const approvalUrl = `${window.location.origin}${window.location.pathname}?report_id=${currentReportId}`;
+    const approvalUrl = `https://auto-fix-alpha.vercel.app/?report_id=${currentReportId}`;
     const messageText = `Dear Customer,\n\nPlease review and approve the suggested repairs for your vehicle using the link below:\n${approvalUrl}\n\nThank you,\nAutoFix Service`;
     
     const encodedText = encodeURIComponent(messageText);
@@ -3383,6 +3383,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
