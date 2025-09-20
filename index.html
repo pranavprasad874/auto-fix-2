@@ -1856,31 +1856,30 @@ async function saveComplaints() {
     if (currentComplaints.length === 0) return showError('Please add at least one complaint.');
     if (!currentVehicleId) return showError('No vehicle selected.');
 
-    // --- Check for existing job card (Robust Version) ---
     const today = new Date().toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
 
-    // Step 1: A simple, reliable query to check for existence and get the executive ID.
-    const { data: existingReport, error: checkError } = await sb
+    // THE FIX: We removed .maybeSingle() to get an array of all duplicates.
+    const { data: existingReports, error: checkError } = await sb
         .from('reports')
-        .select('id, executive_id') // Simplified the select statement
+        .select('id, executive_id')
         .eq('vehicle_id', currentVehicleId)
-        .gte('created_at', `${today} 00:00:00`) // Use a compatible timestamp format
-        .lt('created_at', `${today} 23:59:59`)
-        .maybeSingle();
+        .gte('created_at', `${today} 00:00:00`)
+        .lt('created_at', `${today} 23:59:59`); // <-- No .maybeSingle() modifier here
 
     if (checkError) {
-        // This is where your error was happening.
         console.error("Error checking for existing report:", checkError);
         return showError('Could not check for existing job cards. Please try again.');
     }
 
-    if (existingReport) {
+    // THE FIX: We now check the length of the array.
+    if (existingReports && existingReports.length > 0) {
+        const firstDuplicate = existingReports[0]; // We only need the first one for the message.
         let executiveName = 'another executive';
-        // Step 2: If a duplicate exists, now we can safely fetch the username.
+        
         const { data: userData } = await sb
             .from('users')
             .select('username')
-            .eq('id', existingReport.executive_id)
+            .eq('id', firstDuplicate.executive_id)
             .single();
 
         if (userData) {
@@ -1889,10 +1888,10 @@ async function saveComplaints() {
 
         document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
         showModal('duplicate-job-card-modal');
-        return; // Stop here and wait for user confirmation
+        return; // Stop and wait for confirmation
     }
     
-    // If no duplicate is found, proceed directly
+    // If no duplicates are found, proceed directly.
     await executeSaveComplaints();
 }
 
@@ -3393,6 +3392,7 @@ document.addEventListener('DOMContentLoaded', () => {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
