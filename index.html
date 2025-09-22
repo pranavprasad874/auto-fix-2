@@ -1226,6 +1226,24 @@
             event.target.value = ''; // Reset file input
         }
 
+/**
+ * Safely retrieves and parses the current user from session storage.
+ * @returns {object|null} The user object or null if not found.
+ */
+function getCurrentUser() {
+    const savedUser = sessionStorage.getItem('currentUser');
+    if (savedUser) {
+        try {
+            return JSON.parse(savedUser);
+        } catch (e) {
+            console.error("Could not parse user from session storage.", e);
+            return null;
+        }
+    }
+    return null;
+}
+		
+
         function closeScannerModal() {
             const imagePreview = document.getElementById('scanner-image-preview');
             imagePreview.src = '';
@@ -2023,6 +2041,10 @@ function renderComplaints() {
         }
 
         async function executeSaveComplaints() {
+			const currentUser = getCurrentUser(); // Get user right when needed
+		    if (!currentUser) {
+		        return showError("Your session has expired. Please log out and log back in.");
+		    }
             const hasMedia = capturedPhotos.length > 0 || voiceNoteBlob;
 
             if (hasMedia && !gapi.client.getToken()) {
@@ -2415,12 +2437,13 @@ async function sendApprovalLink() {
     resetVehicleUpdateScreen();
 }
 
-        async function populateNotStartedJobs() {
-            if (!currentUser) {
-                console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
-                document.getElementById('no-pending-jobs-message').classList.remove('hidden');
-                return; 
-            }
+async function populateNotStartedJobs() {
+    const currentUser = getCurrentUser(); // Get user right when needed
+    if (!currentUser) {
+        console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
+        document.getElementById('no-pending-jobs-message').classList.remove('hidden');
+        return; 
+    }
 
             const listContainer = document.getElementById('not-started-jobs-list');
             const noJobsMsg = document.getElementById('no-pending-jobs-message');
@@ -2862,23 +2885,23 @@ async function sendApprovalLink() {
             if (type === 'vehicle_model') renderVehicleModelList();
         }
 
-        const formatArrayCell = (jsonString) => {
-            if (!jsonString || jsonString === '[]') return 'N/A';
-            try {
-                const arr = JSON.parse(jsonString);
-                if (Array.isArray(arr) && arr.length > 0) {
-                    // Check if the items are objects with a 'text' property
-                    if (typeof arr[0] === 'object' && arr[0] !== null && 'text' in arr[0]) {
-                        return arr.map(item => item.text).join(', ');
-                    }
-                    // Fallback for arrays of simple strings
-                    return arr.join(', ');
-                }
-                return 'N/A';
-            } catch (e) {
-                return jsonString;
+const formatArrayCell = (jsonString) => {
+    if (!jsonString || jsonString === '[]') return 'N/A';
+    try {
+        const arr = JSON.parse(jsonString);
+        if (Array.isArray(arr) && arr.length > 0) {
+            // Check if the items are objects with a 'text' property
+            if (typeof arr[0] === 'object' && arr[0] !== null && 'text' in arr[0]) {
+                return arr.map(item => item.text).join(', ');
             }
-        };
+            // Fallback for older data that might just be arrays of strings
+            return arr.join(', ');
+        }
+        return 'N/A';
+    } catch (e) {
+        return jsonString;
+    }
+};
 
         function hideAllSections() {
             vehicleDetailsSection.classList.add('hidden');
@@ -3444,30 +3467,29 @@ async function submitCustomerFeedback() {
 			document.getElementById('print-odometer').textContent = reportData.odometer_reading || 'N/A';
 
             
-            const populateList = (listId, dataString) => {
-                const list = document.getElementById(listId);
-                list.innerHTML = '';
-                try {
-                    const items = JSON.parse(dataString || '[]'); // Safely parse the data
-                    if (items && items.length > 0) {
-                        items.forEach(item => {
-                            const li = document.createElement('li');
-                            // **THE FIX: Check if the item is an object and use its .text property**
-                            if (typeof item === 'object' && item !== null && item.text) {
-                                li.textContent = item.text;
-                            } else {
-                                // Fallback for older data that might just be strings
-                                li.textContent = item;
-                            }
-                            list.appendChild(li);
-                        });
-                    } else {
-                        list.innerHTML = '<li>N/A</li>';
-                    }
-                } catch (e) {
-                    list.innerHTML = '<li>Error loading data</li>';
+const populateList = (listId, dataString) => {
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
+    try {
+        const items = JSON.parse(dataString || '[]'); // Safely parse
+        if (items && items.length > 0) {
+            items.forEach(item => {
+                const li = document.createElement('li');
+                // Check if item is an object with text, otherwise use the item itself
+                if (typeof item === 'object' && item !== null && item.text) {
+                    li.textContent = item.text;
+                } else {
+                    li.textContent = item;
                 }
-            };
+                list.appendChild(li);
+            });
+        } else {
+            list.innerHTML = '<li>N/A</li>';
+        }
+    } catch(e) {
+        list.innerHTML = '<li>Error loading data</li>';
+    }
+};
             populateList('print-complaints-list', reportData.complaint);
             populateList('print-suggested-list', reportData.suggested);
             populateList('print-approved-list', reportData.approved);
@@ -3571,3 +3593,4 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
