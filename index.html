@@ -3257,7 +3257,7 @@ async function loadApprovalScreen(reportId) {
 
 async function submitCustomerFeedback() {
             // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
-            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-XXt-0gyhrTONQQbst8GapT1QknCD1mpX3shbdNBt97aLqEFFjfO4r5Si5HI5A73f/exec";
+            const SCRIPT_URL = "https://script.google.com/macros/s/YOUR_DEPLOYMENT_ID/exec";
 
             const params = new URLSearchParams(window.location.search);
             const reportId = params.get('report_id');
@@ -3533,3 +3533,4 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
