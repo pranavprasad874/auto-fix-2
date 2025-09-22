@@ -1226,24 +1226,6 @@
             event.target.value = ''; // Reset file input
         }
 
-/**
- * Safely retrieves and parses the current user from session storage.
- * @returns {object|null} The user object or null if not found.
- */
-function getCurrentUser() {
-    const savedUser = sessionStorage.getItem('currentUser');
-    if (savedUser) {
-        try {
-            return JSON.parse(savedUser);
-        } catch (e) {
-            console.error("Could not parse user from session storage.", e);
-            return null;
-        }
-    }
-    return null;
-}
-		
-
         function closeScannerModal() {
             const imagePreview = document.getElementById('scanner-image-preview');
             imagePreview.src = '';
@@ -1414,46 +1396,6 @@ function getCurrentUser() {
                 }
             }
         }
-		
-
-/**
-         * Finds the customer's voice note in Google Drive and adds a "Play" button to the UI.
-         * @param {string} gdriveFolderUrl The full URL of the Google Drive folder for the report.
-         * @param {HTMLElement} targetElement The div where the play button should be injected.
-         */
-        async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
-            targetElement.innerHTML = ''; // Clear previous content
-            if (!gdriveFolderUrl || !gapi.client.getToken()) {
-                return; // No folder or not authenticated
-            }
-
-            try {
-                const folderId = gdriveFolderUrl.split('/').pop();
-                
-                // Use the Drive API to search for the specific customer voice note file in the folder
-                const response = await gapi.client.drive.files.list({
-                    q: `'${folderId}' in parents and name contains 'customer_feedback_voice_note'`,
-                    fields: 'files(id, name, webViewLink)',
-                    pageSize: 1
-                });
-
-                if (response.result.files && response.result.files.length > 0) {
-                    const audioFile = response.result.files[0];
-                    // Create a button that links directly to the file in Google Drive
-                    targetElement.innerHTML = `
-                        <a href="${audioFile.webViewLink}" target="_blank" class="btn-secondary !w-auto !py-2 !px-4 text-sm flex items-center gap-2">
-                            <span class="material-symbols-outlined">play_circle</span>
-                            Play Customer Voice Note
-                        </a>`;
-                    targetElement.classList.remove('hidden');
-                }
-            } catch (error) {
-                console.error("Error finding customer audio in Google Drive:", error);
-                targetElement.innerHTML = '<p class="text-xs text-red-500">Could not load audio file from Drive.</p>';
-            }
-        }
-		
-
 
         // --- AUTHENTICATION & UTILITIES ---
         const normalizeVehicleNumber = (num) => {
@@ -2041,10 +1983,6 @@ function renderComplaints() {
         }
 
         async function executeSaveComplaints() {
-			const currentUser = getCurrentUser(); // Get user right when needed
-		    if (!currentUser) {
-		        return showError("Your session has expired. Please log out and log back in.");
-		    }
             const hasMedia = capturedPhotos.length > 0 || voiceNoteBlob;
 
             if (hasMedia && !gapi.client.getToken()) {
@@ -2437,13 +2375,12 @@ async function sendApprovalLink() {
     resetVehicleUpdateScreen();
 }
 
-async function populateNotStartedJobs() {
-    const currentUser = getCurrentUser(); // Get user right when needed
-    if (!currentUser) {
-        console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
-        document.getElementById('no-pending-jobs-message').classList.remove('hidden');
-        return; 
-    }
+        async function populateNotStartedJobs() {
+            if (!currentUser) {
+                console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
+                document.getElementById('no-pending-jobs-message').classList.remove('hidden');
+                return; 
+            }
 
             const listContainer = document.getElementById('not-started-jobs-list');
             const noJobsMsg = document.getElementById('no-pending-jobs-message');
@@ -2885,23 +2822,23 @@ async function populateNotStartedJobs() {
             if (type === 'vehicle_model') renderVehicleModelList();
         }
 
-const formatArrayCell = (jsonString) => {
-    if (!jsonString || jsonString === '[]') return 'N/A';
-    try {
-        const arr = JSON.parse(jsonString);
-        if (Array.isArray(arr) && arr.length > 0) {
-            // Check if the items are objects with a 'text' property
-            if (typeof arr[0] === 'object' && arr[0] !== null && 'text' in arr[0]) {
-                return arr.map(item => item.text).join(', ');
+        const formatArrayCell = (jsonString) => {
+            if (!jsonString || jsonString === '[]') return 'N/A';
+            try {
+                const arr = JSON.parse(jsonString);
+                if (Array.isArray(arr) && arr.length > 0) {
+                    // Check if the items are objects with a 'text' property
+                    if (typeof arr[0] === 'object' && arr[0] !== null && 'text' in arr[0]) {
+                        return arr.map(item => item.text).join(', ');
+                    }
+                    // Fallback for arrays of simple strings
+                    return arr.join(', ');
+                }
+                return 'N/A';
+            } catch (e) {
+                return jsonString;
             }
-            // Fallback for older data that might just be arrays of strings
-            return arr.join(', ');
-        }
-        return 'N/A';
-    } catch (e) {
-        return jsonString;
-    }
-};
+        };
 
         function hideAllSections() {
             vehicleDetailsSection.classList.add('hidden');
@@ -2988,15 +2925,17 @@ const formatArrayCell = (jsonString) => {
     feedbackTextDisplay.textContent = '';
     feedbackAudioDisplay.innerHTML = '';
 
-if (report.customer_feedback_text || report.gdrive_folder_url) {
-            feedbackDisplay.classList.remove('hidden');
-            if (report.customer_feedback_text) {
-                feedbackTextDisplay.textContent = report.customer_feedback_text;
-                feedbackTextDisplay.classList.remove('hidden');
-            }
-            // ADD THIS LINE: Call the new function to find and display the audio button
-            findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay);
+    if (report.customer_feedback_text || report.customer_feedback_audio) {
+        feedbackDisplay.classList.remove('hidden');
+        if (report.customer_feedback_text) {
+            feedbackTextDisplay.textContent = report.customer_feedback_text;
+            feedbackTextDisplay.classList.remove('hidden');
         }
+        if (report.customer_feedback_audio) {
+            feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
+            feedbackAudioDisplay.classList.remove('hidden');
+        }
+    }
 
     document.getElementById('delivery-date').value = report.expected_delivery || '';
     const today = new Date().toISOString().split('T')[0];
@@ -3467,29 +3406,30 @@ async function submitCustomerFeedback() {
 			document.getElementById('print-odometer').textContent = reportData.odometer_reading || 'N/A';
 
             
-const populateList = (listId, dataString) => {
-    const list = document.getElementById(listId);
-    list.innerHTML = '';
-    try {
-        const items = JSON.parse(dataString || '[]'); // Safely parse
-        if (items && items.length > 0) {
-            items.forEach(item => {
-                const li = document.createElement('li');
-                // Check if item is an object with text, otherwise use the item itself
-                if (typeof item === 'object' && item !== null && item.text) {
-                    li.textContent = item.text;
-                } else {
-                    li.textContent = item;
+            const populateList = (listId, dataString) => {
+                const list = document.getElementById(listId);
+                list.innerHTML = '';
+                try {
+                    const items = JSON.parse(dataString || '[]'); // Safely parse the data
+                    if (items && items.length > 0) {
+                        items.forEach(item => {
+                            const li = document.createElement('li');
+                            // **THE FIX: Check if the item is an object and use its .text property**
+                            if (typeof item === 'object' && item !== null && item.text) {
+                                li.textContent = item.text;
+                            } else {
+                                // Fallback for older data that might just be strings
+                                li.textContent = item;
+                            }
+                            list.appendChild(li);
+                        });
+                    } else {
+                        list.innerHTML = '<li>N/A</li>';
+                    }
+                } catch (e) {
+                    list.innerHTML = '<li>Error loading data</li>';
                 }
-                list.appendChild(li);
-            });
-        } else {
-            list.innerHTML = '<li>N/A</li>';
-        }
-    } catch(e) {
-        list.innerHTML = '<li>Error loading data</li>';
-    }
-};
+            };
             populateList('print-complaints-list', reportData.complaint);
             populateList('print-suggested-list', reportData.suggested);
             populateList('print-approved-list', reportData.approved);
@@ -3593,4 +3533,3 @@ const populateList = (listId, dataString) => {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
-
