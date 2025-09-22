@@ -1681,7 +1681,7 @@
 						const targetCell = document.getElementById(`customer-audio-cell-${row.id}`);
 						if (targetCell) {
 							// We reuse the same helper function to find the audio and add a button
-							findAndDisplayCustomerAudio(row.gdrive_folder_url, targetCell);
+							findAndDisplayCustomerAudio(row.gdrive_folder_url, targetCell, row.id);
 						}
 					}
 				});
@@ -2872,48 +2872,41 @@ async function sendApprovalLink() {
             document.getElementById('recording-status').textContent = '';
         }
 
+
 /**
- * Finds the customer's voice note in Google Drive and adds a "Play" button to the UI.
+ * Finds the customer's voice note by calling the Google Apps Script and adds a "Play" button.
  * @param {string} gdriveFolderUrl The full URL of the Google Drive folder for the report.
  * @param {HTMLElement} targetElement The div where the play button should be injected.
+ * @param {number} reportId The ID of the report to build the unique filename.
  */
-async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
-    targetElement.innerHTML = ''; // Clear previous content
-    
-    // IMPROVEMENT: Better check for Google authentication
-    if (!gapi.client.getToken()) {
-        targetElement.innerHTML = '<p class="text-xs text-orange-500">Google Auth needed</p>';
-        return; // Stop if the user is not authenticated with Google
-    }
+async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement, reportId) {
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-XXt-0gyhrTONQQbst8GapT1QknCD1mpX3shbdNBt97aLqEFFjfO4r5Si5HI5A73f/exec";
 
-    if (!gdriveFolderUrl) {
-        return; // No folder to search in, so we leave it blank
-    }
+    targetElement.innerHTML = ''; // Clear previous content
+    if (!gdriveFolderUrl) return;
 
     try {
         const folderId = gdriveFolderUrl.split('/').pop();
+        const fileNameToFind = `customer_voice_note_${reportId}.webm`;
         
-        // THE FIX: Corrected the file name in the search query
-        const response = await gapi.client.drive.files.list({
-            q: `'${folderId}' in parents and name contains 'customer_voice_note'`, // Was 'customer_feedback_voice_note'
-            fields: 'files(id, name, webViewLink)',
-            pageSize: 1
-        });
+        // Construct the URL to call our script's doGet function
+        const url = `${SCRIPT_URL}?folderId=${folderId}&fileNameQuery=${fileNameToFind}`;
+        
+        const response = await fetch(url);
+        const result = await response.json();
 
-        if (response.result.files && response.result.files.length > 0) {
-            const audioFile = response.result.files[0];
-            // Create a button that links directly to the file in Google Drive
+        if (result.status === 'success' && result.link) {
             targetElement.innerHTML = `
-                <a href="${audioFile.webViewLink}" target="_blank" class="btn-secondary !w-auto !py-1 !px-2 text-xs flex items-center gap-1">
+                <a href="${result.link}" target="_blank" class="btn-secondary !w-auto !py-1 !px-2 text-xs flex items-center gap-1">
                     <span class="material-symbols-outlined !text-base">play_circle</span>
                     Play Note
                 </a>`;
-            targetElement.classList.remove('hidden');
         } else {
-             targetElement.innerHTML = 'N/A'; // Show N/A if no file was found
+            targetElement.innerHTML = 'N/A';
         }
     } catch (error) {
-        console.error("Error finding customer audio in Google Drive:", error);
+        console.error("Error fetching customer audio link:", error);
         targetElement.innerHTML = '<p class="text-xs text-red-500">Error loading audio</p>';
     }
 }
@@ -2986,7 +2979,7 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
                     feedbackTextDisplay.classList.remove('hidden');
                 }
                 // This line now correctly looks in Google Drive for the audio
-                findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay);
+                findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay, report.id);
             }
             // END OF REPLACEMENT
 
@@ -3582,6 +3575,7 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
