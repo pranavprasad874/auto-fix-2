@@ -61,7 +61,24 @@
         .report-table td { @apply px-4 py-4 whitespace-nowrap text-sm; }
         .report-table tbody tr:nth-child(even) { @apply bg-white; }
         .report-table tbody tr:nth-child(odd) { @apply bg-gray-50; }
-        
+
+        /* Voice Note Button Animation */
+        @keyframes pulse-ring {
+          0% {
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.7);
+          }
+          70% {
+            box-shadow: 0 0 0 12px rgba(37, 99, 235, 0);
+          }
+          100% {
+            box-shadow: 0 0 0 0 rgba(37, 99, 235, 0);
+          }
+        }
+        .record-button.is-recording {
+            @apply bg-blue-600 hover:bg-blue-700 text-white;
+            animation: pulse-ring 1.5s infinite;
+        }
+
         /* Styles for the accordion list in Due Date page */
         .due-date-details {
             max-height: 0;
@@ -74,54 +91,59 @@
         .due-date-item.expanded .due-date-header .material-symbols-outlined {
             transform: rotate(180deg);
         }
+
 		/* Styles for Printing */
         .printable-area {
             display: none;
         }
-/* ADD THIS CSS FOR THE TABS */
-.tab-button {
-    @apply -mb-px border-b-2 border-transparent px-4 py-3 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700;
-}
-.tab-button.active-tab {
-    @apply border-blue-600 text-blue-600;
-}
-.menu-container {
-    position: relative;
-}
-.menu-button {
-    background: none;
-    border: none;
-    cursor: pointer;
-}
-.dropdown-menu {
-    display: none;
-    position: absolute;
-    right: 0;
-    background-color: white;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-    z-index: 20;
-    width: 120px;
-}
-.menu-container:hover .dropdown-menu {
-    display: block;
-}
-.dropdown-item {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    padding: 0.75rem 1rem;
-    cursor: pointer;
-    font-size: 0.875rem;
-    color: var(--text-secondary);
-}
-.dropdown-item:hover {
-    background-color: #f3f4f6; /* Gray 100 */
-}
-.dropdown-item .material-symbols-outlined {
-    font-size: 1.25rem;
-}
+		
+        /* Tab Styles */
+        .tab-button {
+            @apply -mb-px border-b-2 border-transparent px-4 py-3 text-sm font-medium text-gray-500 hover:border-gray-300 hover:text-gray-700;
+        }
+        .tab-button.active-tab {
+            @apply border-blue-600 text-blue-600;
+        }
+
+        /* Dropdown Menu Styles */
+        .menu-container {
+            position: relative;
+        }
+        .menu-button {
+            background: none;
+            border: none;
+            cursor: pointer;
+        }
+        .dropdown-menu {
+            display: none;
+            position: absolute;
+            right: 0;
+            background-color: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            z-index: 20;
+            width: 120px;
+        }
+        .menu-container:hover .dropdown-menu {
+            display: block;
+        }
+        .dropdown-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+        }
+        .dropdown-item:hover {
+            background-color: #f3f4f6; /* Gray 100 */
+        }
+        .dropdown-item .material-symbols-outlined {
+            font-size: 1.25rem;
+        }
+
         @media print {
             body * {
                 visibility: hidden;
@@ -194,13 +216,13 @@
                     <h2 class="text-xl font-bold mb-4">Filter Reports</h2>
                     <div id="admin-report-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                         <div class="space-y-1">
-    <label for="admin-filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
-    <input type="date" id="admin-filter-from-date" class="form-input" onchange="handleDateChange('admin-filter-from-date', 'admin-filter-to-date'); applyAdminReportFilters();">
-</div>
-<div class="space-y-1">
-    <label for="admin-filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
-    <input type="date" id="admin-filter-to-date" class="form-input" onchange="handleDateChange('admin-filter-from-date', 'admin-filter-to-date'); applyAdminReportFilters();">
-</div>
+                            <label for="admin-filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
+                            <input type="date" id="admin-filter-from-date" class="form-input" onchange="handleDateChange('admin-filter-from-date', 'admin-filter-to-date'); applyAdminReportFilters();">
+                        </div>
+                        <div class="space-y-1">
+                            <label for="admin-filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
+                            <input type="date" id="admin-filter-to-date" class="form-input" onchange="handleDateChange('admin-filter-from-date', 'admin-filter-to-date'); applyAdminReportFilters();">
+                        </div>
                         
                         <input type="text" id="admin-filter-vehicle-no" class="form-input" placeholder="Vehicle Number" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); applyAdminReportFilters()">
                         <input type="text" id="admin-filter-brand" class="form-input" placeholder="Brand" oninput="applyAdminReportFilters()">
@@ -210,12 +232,12 @@
                 </div>
                 <div class="card">
                     <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold">Service History</h2>
-    <button onclick="downloadReport()" class="flex items-center gap-1 px-3 py-1 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700">
-        <span class="material-symbols-outlined">download</span>
-        Download Report
-    </button>
-</div>
+                        <h2 class="text-xl font-bold">Service History</h2>
+                        <button onclick="downloadReport()" class="flex items-center gap-1 px-3 py-1 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700">
+                            <span class="material-symbols-outlined">download</span>
+                            Download Report
+                        </button>
+                    </div>
                     <div class="table-container">
                         <table class="report-table">
                             <thead>
@@ -357,10 +379,10 @@
                     <div><label class="form-label">Chassis Number <span class="text-red-500">*</span></label><input id="new-chassis-no" type="text" class="form-input" placeholder="Enter chassis number" required></div>
                     <div class="sm:col-span-2"><label class="form-label">Odometer Reading (km) <span class="text-red-500">*</span></label><input id="new-odometer" type="number" class="form-input" placeholder="e.g., 54000" required></div>
                     <div class="sm:col-span-2 border-t pt-4"><label class="form-label">Client Name <span class="text-red-500">*</span></label><input id="new-client-name" type="text" class="form-input" placeholder="e.g., John Doe" required></div>
-<div class="sm:col-span-2">
-    <label class="form-label">Client Phone <span class="text-red-500">*</span></label>
-    <input id="new-client-phone" type="tel" class="form-input" placeholder="e.g., 9876543210" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
-</div>
+                    <div class="sm:col-span-2">
+                        <label class="form-label">Client Phone <span class="text-red-500">*</span></label>
+                        <input id="new-client-phone" type="tel" class="form-input" placeholder="e.g., 9876543210" required maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');">
+                    </div>
                 </div><div class="mt-6"><button type="submit" class="btn-primary"><span class="material-symbols-outlined">save</span>Save Vehicle</button></div></form></div>
                 
                 <div id="new-complaint-section" class="card hidden">
@@ -369,12 +391,14 @@
                         <div id="complaints-list" class="space-y-2">
                             <p class="text-sm text-gray-500">No complaints added yet.</p>
                         </div>
-                        <div class="flex items-center gap-2">
-                            <input id="complaint-input" type="text" class="form-input flex-grow" placeholder="e.g., Engine noise on startup" onkeydown="if(event.key==='Enter'){event.preventDefault(); addComplaint();}">
-                            <button type="button" onclick="addComplaint()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
-                                <span class="material-symbols-outlined">add</span>
-                            </button>
-                        </div>
+                        <!-- REPLACE this div inside #new-complaint-section -->
+<!-- New simplified input for the Job Card page -->
+<div class="flex items-center gap-2">
+    <input id="complaint-input" type="text" class="form-input flex-grow" placeholder="e.g., Engine noise on startup">
+    <button type="button" onclick="addComplaint()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
+        <span class="material-symbols-outlined">add</span>
+    </button>
+</div>
                         
                         <div class="mt-4 pt-4 border-t">
                           <label class="form-label">Mark Damages on Vehicle</label>
@@ -385,39 +409,44 @@
 						  </div>
                           <p class="text-sm text-gray-500 mt-2">Click on the car image to mark scratches/damages.</p>
                           <div class="flex items-center gap-3 mt-3">
-                              <button type="button" onclick="undoLastMark()" class="btn-secondary !py-2 !px-3 text-sm !w-auto flex items-center gap-1">
-                                  <span class="material-symbols-outlined text-base">undo</span>Undo Last
-                              </button>
-                              <button type="button" onclick="clearDamageCanvas()" class="flex items-center gap-1 !w-auto rounded-lg bg-red-100 text-red-700 font-bold py-2 px-3 shadow-sm hover:bg-red-200 transition-colors text-sm">
-                                  <span class="material-symbols-outlined text-base">delete_sweep</span>Clear All
-                              </button>
-                          </div>
-                          </div>
+    <!-- MODIFIED "Undo" BUTTON -->
+    <button type="button" onclick="undoLastMark()" class="inline-flex items-center gap-1 rounded-lg bg-blue-100 text-blue-700 font-bold py-1.5 px-3 text-xs shadow-sm hover:bg-blue-200 transition-colors">
+        <span class="material-symbols-outlined !text-base">undo</span>
+        <span>Undo Last</span>
+    </button>
+    <!-- MODIFIED "Clear" BUTTON -->
+    <button type="button" onclick="clearDamageCanvas()" class="inline-flex items-center gap-1 rounded-lg bg-red-100 text-red-700 font-bold py-1.5 px-3 text-xs shadow-sm hover:bg-red-200 transition-colors">
+        <span class="material-symbols-outlined !text-base">delete_sweep</span>
+        <span>Clear All</span>
+    </button>
+</div>
                         
-                        <div class="mt-4 pt-4 border-t space-y-3">
-                            <label class="form-label">Attach Photos & Voice Note</label>
-                            <!-- Photo Upload -->
-                            <div>
-                                <input type="file" id="photo-upload-input" multiple accept="image/*" class="hidden" onchange="handlePhotoUploads(event)">
-                                <button type="button" onclick="document.getElementById('photo-upload-input').click()" class="btn-secondary !w-auto !py-2 !px-3 text-sm flex items-center gap-2">
-                                    <span class="material-symbols-outlined">add_a_photo</span> Add Photos
-                                </button>
-                                <div id="photo-previews" class="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"></div>
-                            </div>
-                            <!-- Voice Note -->
-                            <div>
-                                <div class="flex items-center gap-3">
-                                    <button id="record-btn" type="button" onclick="startRecording()" class="btn-secondary !w-auto !py-2 !px-3 text-sm flex items-center gap-2">
-                                        <span class="material-symbols-outlined">mic</span> Record Note
-                                    </button>
-                                    <button id="stop-record-btn" type="button" onclick="stopRecording()" class="btn-primary !w-auto !py-2 !px-3 text-sm flex items-center gap-2 hidden !bg-red-600">
-                                        <span class="material-symbols-outlined">stop_circle</span> Stop
-                                    </button>
-                                </div>
-                                <div id="audio-playback" class="mt-3"></div>
-                                 <p id="recording-status" class="text-sm text-gray-500 mt-1"></p>
-                            </div>
-                        </div>
+                        <!-- The updated section with smaller, blue buttons -->
+<div class="mt-4 pt-4 border-t space-y-3">
+    <label class="form-label">Attach Photos & Voice Note</label>
+    <!-- Photo Upload -->
+    <div>
+        <input type="file" id="photo-upload-input" multiple accept="image/*" class="hidden" onchange="handlePhotoUploads(event)">
+        <!-- MODIFIED BUTTON -->
+        <button type="button" onclick="document.getElementById('photo-upload-input').click()" class="inline-flex items-center gap-1 rounded-lg bg-blue-100 text-blue-700 font-bold py-1.5 px-3 text-xs shadow-sm hover:bg-blue-200 transition-colors">
+            <span class="material-symbols-outlined !text-base">add_a_photo</span>
+            <span>Add Photos</span>
+        </button>
+        <div id="photo-previews" class="mt-3 grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-3"></div>
+    </div>
+    <!-- Voice Note -->
+    <div>
+        <div class="flex items-center gap-3">
+            <!-- MODIFIED BUTTON -->
+            <button id="record-toggle-btn" type="button" onclick="handleRecordingToggle()" class="record-button inline-flex items-center gap-1 rounded-lg bg-blue-100 text-blue-700 font-bold py-1.5 px-3 text-xs shadow-sm hover:bg-blue-200 transition-colors duration-300">
+                <span id="record-icon" class="material-symbols-outlined !text-base">mic</span>
+                <span id="record-text">Record Note</span>
+            </button>
+        </div>
+        <div id="audio-playback" class="mt-3"></div>
+         <p id="recording-status" class="text-sm text-gray-500 mt-1"></p>
+    </div>
+</div>
 
                         <div class="mt-6">
                             <button onclick="saveComplaints()" class="btn-primary"><span class="material-symbols-outlined">add_task</span>Save Complaints & Media</button>
@@ -428,83 +457,118 @@
         </div>
 
         <div id="vehicle-update-screen" class="executive-screen" style="display: none;">
-
-
 			<main class="app-main">
-  
-
-    <div id="update-tab-container" class="card !p-0">
-        <div class="flex border-b border-gray-200 px-5">
-            <button id="tab-btn-pending" class="tab-button active-tab" onclick="showUpdateTab('pending')">Pending Jobs</button>
-            <button id="tab-btn-awaiting" class="tab-button" onclick="showUpdateTab('awaiting')">Awaiting Response</button>
-            <button id="tab-btn-responses" class="tab-button" onclick="showUpdateTab('responses')">Responses Received</button>
-        </div>
-        <div class="p-5">
-            <div id="pending-jobs-panel" class="tab-panel">
-                <div id="not-started-jobs-list" class="space-y-3"></div>
-                <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No pending job cards found.</p>
-            </div>
-            <div id="awaiting-response-panel" class="tab-panel hidden">
-                <div id="awaiting-response-list" class="space-y-3"></div>
-                <p id="no-awaiting-response-message" class="text-center text-gray-500 py-8 hidden">No jobs are currently awaiting a customer response.</p>
-            </div>
-            <div id="responses-received-panel" class="tab-panel hidden">
-                <div id="customer-response-list" class="space-y-3"></div>
-                <p id="no-customer-response-message" class="text-center text-gray-500 py-8 hidden">No new customer responses found.</p>
-            </div>
-        </div>
-    </div>
-
-    <div id="update-details-section" class="card hidden space-y-4">
-        <h2 class="text-xl font-bold flex items-center gap-2 text-green-600"><span class="material-symbols-outlined">check_circle</span> Selected Report</h2>
-        <div class="grid grid-cols-2 gap-4 text-base border-t pt-4">
-            <div><p class="font-medium text-[var(--text-secondary)]">Vehicle Number</p><p id="update-detail-number" class="font-bold text-lg"></p></div>
-            <div><p class="font-medium text-[var(--text-secondary)]">Total Complaints</p><p id="update-detail-complaint" class="font-semibold"></p></div>
-        </div>
-        <div id="original-complaints-display" class="border-t pt-4 hidden">
-            <h3 class="font-bold text-gray-700 mb-2">Registered Complaints:</h3>
-            <ul id="original-complaints-list" class="list-disc list-inside text-gray-600 space-y-1"></ul>
-        </div>
-        <div id="customer-feedback-display" class="border-t pt-4 hidden">
-            <h3 class="font-bold text-green-700 mb-2 flex items-center gap-2"><span class="material-symbols-outlined">rate_review</span> Customer Feedback Received:</h3>
-            <div id="customer-feedback-text-display" class="text-gray-600 bg-gray-50 p-3 rounded-lg hidden"></div>
-            <div id="customer-feedback-audio-display" class="mt-2 hidden"></div>
-        </div>
-    </div>
-    <div id="update-form-section" class="card hidden">
-        <form onsubmit="event.preventDefault(); saveVehicleUpdate();" class="space-y-6">
-            <div><label class="form-label">Suggested Repair (from Mechanic)</label><div class="flex items-center gap-2"><input id="suggestion-input" type="text" class="form-input flex-grow" placeholder="e.g., Change engine oil"><button type="button" onclick="addSuggestion()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200"><span class="material-symbols-outlined">add</span></button></div><div id="executive-suggestions-list" class="mt-3 space-y-2"></div></div>
-            <div><h3 class="text-base font-bold mb-2 border-t pt-4">Customer Approved Suggestions</h3><div id="customer-approval-list" class="space-y-2"><p class="text-sm text-gray-500">Add suggestions above to see them here for approval.</p></div></div>
-            
-            <div>
-                <label class="form-label border-t pt-4">Materials Required for Service</label>
-                <div class="flex items-center gap-2">
-                    <input id="material-input" type="text" class="form-input flex-grow" placeholder="e.g., 1L Engine Oil, 4 Spark Plugs">
-                    <button type="button" onclick="addMaterial()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
-                        <span class="material-symbols-outlined">add</span>
-                    </button>
+                <div id="update-tab-container" class="card !p-0">
+                    <div class="flex border-b border-gray-200 px-5">
+                        <button id="tab-btn-pending" class="tab-button active-tab" onclick="showUpdateTab('pending')">Pending Jobs</button>
+                        <button id="tab-btn-awaiting" class="tab-button" onclick="showUpdateTab('awaiting')">Awaiting Response</button>
+                        <button id="tab-btn-responses" class="tab-button" onclick="showUpdateTab('responses')">Responses Received</button>
+                    </div>
+                    <div class="p-5">
+                        <div id="pending-jobs-panel" class="tab-panel">
+                            <div id="not-started-jobs-list" class="space-y-3"></div>
+                            <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No pending job cards found.</p>
+                        </div>
+                        <div id="awaiting-response-panel" class="tab-panel hidden">
+                            <div id="awaiting-response-list" class="space-y-3"></div>
+                            <p id="no-awaiting-response-message" class="text-center text-gray-500 py-8 hidden">No jobs are currently awaiting a customer response.</p>
+                        </div>
+                        <div id="responses-received-panel" class="tab-panel hidden">
+                            <div id="customer-response-list" class="space-y-3"></div>
+                            <p id="no-customer-response-message" class="text-center text-gray-500 py-8 hidden">No new customer responses found.</p>
+                        </div>
+                    </div>
                 </div>
-                <div id="materials-required-list" class="mt-3 space-y-2"></div>
-            </div>
 
-            <div><label for="delivery-date" class="form-label border-t pt-4">Expected Delivery Date <span class="text-red-500">*</span></label><input id="delivery-date" type="date" class="form-input" required></div>
-            
-            <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <button type="submit" class="btn-primary">
-                    <span class="material-symbols-outlined">save</span>Save Update
-                </button>
-                <button type="button" id="send-whatsapp-btn" onclick="sendApprovalLink()" class="btn-whatsapp">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                        <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.003-5.462-4.415-9.89-9.881-9.894-5.462-.004-9.89 4.415-9.894 9.881-.002 2.225.651 3.891 1.746 5.634l-.999 3.648 3.747-.976zm11.387-5.464c-.074-.124-.272-.198-.568-.347-.297-.149-1.758-.868-2.03-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.173.198-.297.297-.495.099-.198.05-.372-.025-.521-.074-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"></path>
-                    </svg>
-                    Send Approval via WhatsApp
-                </button>
+                <div id="update-details-section" class="card hidden space-y-4">
+                    <h2 class="text-xl font-bold flex items-center gap-2 text-green-600"><span class="material-symbols-outlined">check_circle</span> Selected Report</h2>
+                    <div class="grid grid-cols-2 gap-4 text-base border-t pt-4">
+                        <div><p class="font-medium text-[var(--text-secondary)]">Vehicle Number</p><p id="update-detail-number" class="font-bold text-lg"></p></div>
+                        <div><p class="font-medium text-[var(--text-secondary)]">Total Complaints</p><p id="update-detail-complaint" class="font-semibold"></p></div>
+                    </div>
+                    <div id="original-complaints-display" class="border-t pt-4 hidden">
+                        <h3 class="font-bold text-gray-700 mb-2">Registered Complaints:</h3>
+                        <ul id="original-complaints-list" class="list-disc list-inside text-gray-600 space-y-1"></ul>
+                    </div>
+                    <div id="customer-feedback-display" class="border-t pt-4 hidden">
+                        <h3 class="font-bold text-green-700 mb-2 flex items-center gap-2"><span class="material-symbols-outlined">rate_review</span> Customer Feedback Received:</h3>
+                        <div id="customer-feedback-text-display" class="text-gray-600 bg-gray-50 p-3 rounded-lg hidden"></div>
+                        <div id="customer-feedback-audio-display" class="mt-2 hidden"></div>
+                    </div>
+                </div>
+                <!-- REPLACE this entire div -->
+<!-- REPLACE this entire div -->
+<div id="update-form-section" class="card hidden">
+    <form onsubmit="event.preventDefault(); saveVehicleUpdate();" class="space-y-6">
+        
+        <div>
+            <h3 class="text-base font-bold mb-2">Customer's Registered Complaints</h3>
+            <div id="customer-complaints-list" class="space-y-2">
+                <p class="text-sm text-gray-500">No original complaints were registered.</p>
             </div>
-        </form>
+        </div>
+        
+        <!-- The new, cleaner layout for adding mechanic suggestions -->
+<div class="border-t pt-4">
+    <label class="form-label">Add New Suggested Repair (from Mechanic)</label>
+    <div class="flex items-center justify-between gap-3 p-3 bg-gray-100 rounded-lg">
+        <div class="flex-1">
+            <input id="suggestion-input" type="text" class="form-input !py-1 !px-2 w-full" placeholder="e.g., Change engine oil">
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="font-bold text-gray-500">₹</span>
+            <input id="suggestion-amount-input" type="number" class="form-input !py-1 !px-2 w-28 text-right" placeholder="Cost">
+            <button type="button" onclick="addSuggestion()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
+                <span class="material-symbols-outlined">add</span>
+            </button>
+        </div>
     </div>
-</main>
+    <div id="executive-suggestions-list" class="mt-3 space-y-2"></div>
+</div>
 
-			
+        <div>
+            <h3 class="text-base font-bold mb-2 border-t pt-4">Customer Approval for Mechanic Suggestions</h3>
+            <div id="customer-approval-list" class="space-y-2">
+                <p class="text-sm text-gray-500">Add mechanic suggestions above to see them here for approval.</p>
+            </div>
+        </div>
+        
+        <div class="border-t pt-4">
+            <label class="form-label">Approximate Service Amount</label>
+            <p id="approx-total-amount" class="text-2xl font-bold text-gray-800">₹ 0.00</p>
+            <p class="text-xs text-gray-500">This is an estimated total based on all customer complaints and suggested repairs.</p>
+        </div>
+
+        <div>
+            <label class="form-label border-t pt-4">Materials Required for Service</label>
+            <div class="flex items-center gap-2">
+                <input id="material-input" type="text" class="form-input flex-grow" placeholder="e.g., 1L Engine Oil, 4 Spark Plugs">
+                <button type="button" onclick="addMaterial()" class="p-2 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
+                    <span class="material-symbols-outlined">add</span>
+                </button>
+            </div>
+            <div id="materials-required-list" class="mt-3 space-y-2"></div>
+        </div>
+
+        <div>
+            <label for="delivery-date" class="form-label border-t pt-4">Expected Delivery Date <span class="text-red-500">*</span></label>
+            <input id="delivery-date" type="date" class="form-input" required>
+        </div>
+        
+        <div class="pt-2 grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <button type="submit" class="btn-primary">
+                <span class="material-symbols-outlined">save</span>Save Update
+            </button>
+            <button type="button" id="send-whatsapp-btn" onclick="sendApprovalLink()" class="btn-whatsapp">
+                <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M.057 24l1.687-6.163c-1.041-1.804-1.588-3.849-1.587-5.946.003-6.556 5.338-11.891 11.893-11.891 3.181.001 6.167 1.24 8.413 3.488 2.245 2.248 3.481 5.236 3.48 8.414-.003 6.557-5.338 11.892-11.893 11.892-1.99-.001-3.951-.5-5.688-1.448L.057 24zm6.597-3.807c1.676.995 3.276 1.591 5.392 1.592 5.448 0 9.886-4.434 9.889-9.885.003-5.462-4.415-9.89-9.881-9.894-5.462-.004-9.89 4.415-9.894 9.881-.002 2.225.651 3.891 1.746 5.634l-.999 3.648 3.747-.976zm11.387-5.464c-.074-.124-.272-.198-.568-.347-.297-.149-1.758-.868-2.03-.967-.272-.099-.47-.149-.669.149-.198.297-.768.967-.941 1.165-.173.198-.347.223-.644.074-.297-.149-1.255-.462-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.297-.347.446-.521.149-.173.198-.297.297-.495.099-.198.05-.372-.025-.521-.074-.149-.669-1.611-.916-2.206-.242-.579-.487-.5-.669-.51l-.57-.01c-.198 0-.52.074-.792.372s-1.04 1.016-1.04 2.479 1.065 2.876 1.213 3.074c.149.198 2.095 3.2 5.076 4.487.709.306 1.262.489 1.694.626.712.226 1.36.194 1.872.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413z"></path>
+                </svg>
+                Send Approval via WhatsApp
+            </button>
+        </div>
+    </form>
+</div>
+            </main>
         </div>
         
         <div id="report-screen" class="executive-screen" style="display: none;">
@@ -513,13 +577,13 @@
                     <h2 class="text-xl font-bold mb-4">Filter Reports</h2>
                     <div id="report-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
                         <div class="space-y-1">
-    <label for="filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
-    <input type="date" id="filter-from-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
-</div>
-<div class="space-y-1">
-    <label for="filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
-    <input type="date" id="filter-to-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
-</div>
+                            <label for="filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
+                            <input type="date" id="filter-from-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
+                        </div>
+                        <div class="space-y-1">
+                            <label for="filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
+                            <input type="date" id="filter-to-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
+                        </div>
                        
                         <input type="text" id="filter-vehicle-no" class="form-input" placeholder="Vehicle Number" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); applyReportFilters()">
                         <input type="text" id="filter-brand" class="form-input" placeholder="Brand" oninput="applyReportFilters()">
@@ -529,12 +593,12 @@
                 </div>
                 <div class="card">
                     <div class="flex justify-between items-center mb-4">
-    <h2 class="text-xl font-bold">Service History</h2>
-    <button onclick="downloadReport()" class="flex items-center gap-1 px-3 py-1 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700">
-        <span class="material-symbols-outlined">download</span>
-        Download Report
-    </button>
-</div>
+                        <h2 class="text-xl font-bold">Service History</h2>
+                        <button onclick="downloadReport()" class="flex items-center gap-1 px-3 py-1 text-sm font-bold text-white bg-green-600 rounded-lg hover:bg-green-700">
+                            <span class="material-symbols-outlined">download</span>
+                            Download Report
+                        </button>
+                    </div>
                     <div class="table-container">
                         <table class="report-table">
                            <thead>
@@ -644,6 +708,14 @@
                             <div id="approval-suggestions-list" class="space-y-2 border-t pt-3">
                                 <!-- Suggestions will be populated here -->
                             </div>
+							<!-- Find the div with id="approval-suggestions-list" and ADD this div right after it -->
+				<div class="border-t pt-4 mt-4">
+				<div class="flex justify-between items-center">
+					<label class="form-label mb-0 font-bold text-lg">Estimated Total:</label>
+					<p id="cust-total-amount" class="text-2xl font-bold text-gray-800">₹ 0.00</p>
+			</div>
+			<p class="text-xs text-gray-500 text-right">Based on your selected services.</p>
+				</div>
                         </div>
 
                         <div class="border-t pt-4">
@@ -652,18 +724,17 @@
                         </div>
                         
                         <div class="border-t pt-4">
-                            <label class="form-label">Record a Voice Note (Optional):</label>
-                             <div class="flex items-center gap-3">
-                                <button id="customer-record-btn" type="button" onclick="startRecording('customer')" class="btn-secondary !w-auto !py-2 !px-3 text-sm flex items-center gap-2">
-                                    <span class="material-symbols-outlined">mic</span> Record
-                                </button>
-                                <button id="customer-stop-record-btn" type="button" onclick="stopRecording('customer')" class="btn-primary !w-auto !py-2 !px-3 text-sm flex items-center gap-2 hidden !bg-red-600">
-                                    <span class="material-symbols-outlined">stop_circle</span> Stop
-                                </button>
-                            </div>
-                            <div id="customer-audio-playback" class="mt-3"></div>
-                            <p id="customer-recording-status" class="text-sm text-gray-500 mt-1"></p>
-                        </div>
+    <label class="form-label">Record a Voice Note (Optional):</label>
+    <div class="flex items-center gap-3">
+        <!-- MODIFIED BUTTON -->
+        <button id="cust-approval-record-btn" type="button" onclick="handleCustomerApprovalRecordingToggle()" class="record-button inline-flex items-center gap-1 rounded-lg bg-blue-100 text-blue-700 font-bold py-1.5 px-3 text-xs shadow-sm hover:bg-blue-200 transition-colors duration-300">
+            <span id="cust-approval-record-icon" class="material-symbols-outlined !text-base">mic</span>
+            <span id="cust-approval-record-text">Record</span>
+        </button>
+    </div>
+    <div id="customer-audio-playback" class="mt-3"></div>
+    <p id="customer-recording-status" class="text-sm text-gray-500 mt-1"></p>
+</div>
 
                         <div class="mt-6 border-t pt-6">
                              <button onclick="submitCustomerFeedback()" class="btn-primary">
@@ -705,87 +776,84 @@
 
     <div id="delete-confirmation-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden"><div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div><div class="relative bg-white rounded-lg p-6 w-full max-w-sm m-4 space-y-4"><h3 class="text-xl font-bold text-gray-800">Confirm Deletion</h3><p id="delete-modal-text" class="text-gray-600"></p><div class="flex justify-end gap-4 pt-4"><button onclick="hideModal('delete-confirmation-modal')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button><button id="confirm-delete-button" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">Confirm Delete</button></div></div></div>
 
-<div id="duplicate-job-card-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
-        <div class="flex items-start">
-            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
-                <span class="material-symbols-outlined text-yellow-600">warning</span>
+    <div id="duplicate-job-card-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
+            <div class="flex items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-yellow-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <span class="material-symbols-outlined text-yellow-600">warning</span>
+                </div>
+                <div class="ml-4 text-left">
+                     <h3 class="text-xl font-bold text-gray-800">Duplicate Job Card Warning</h3>
+                     <p id="duplicate-modal-text" class="text-gray-600 mt-2"></p>
+                </div>
             </div>
-            <div class="ml-4 text-left">
-                 <h3 class="text-xl font-bold text-gray-800">Duplicate Job Card Warning</h3>
-                 <p id="duplicate-modal-text" class="text-gray-600 mt-2"></p>
+            <div class="mt-4 border-t pt-4">
+                <label for="duplicate-confirmation-input" class="form-label">To proceed with creating a new job card, please type 'yes' below and confirm.</label>
+                <input id="duplicate-confirmation-input" type="text" class="form-input" placeholder="Type 'yes' to confirm">
             </div>
-        </div>
-        <div class="mt-4 border-t pt-4">
-            <label for="duplicate-confirmation-input" class="form-label">To proceed with creating a new job card, please type 'yes' below and confirm.</label>
-            <input id="duplicate-confirmation-input" type="text" class="form-input" placeholder="Type 'yes' to confirm">
-        </div>
-        <div class="flex justify-end gap-4 pt-4">
-            <button onclick="hideModal('duplicate-job-card-modal')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button>
-            <button id="confirm-duplicate-button" onclick="handleDuplicateConfirmation()" class="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold">Confirm & Proceed</button>
+            <div class="flex justify-end gap-4 pt-4">
+                <button onclick="hideModal('duplicate-job-card-modal')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button>
+                <button id="confirm-duplicate-button" onclick="handleDuplicateConfirmation()" class="px-4 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-white font-semibold">Confirm & Proceed</button>
+            </div>
         </div>
     </div>
-</div>
 
-
-<div id="cancel-confirmation-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
-        <div class="flex items-start">
-            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
-                <span class="material-symbols-outlined text-red-600">cancel</span>
+    <div id="cancel-confirmation-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
+            <div class="flex items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <span class="material-symbols-outlined text-red-600">cancel</span>
+                </div>
+                <div class="ml-4 text-left">
+                     <h3 class="text-xl font-bold text-gray-800">Confirm Job Cancellation</h3>
+                     <p id="cancel-modal-text" class="text-gray-600 mt-2"></p>
+                </div>
             </div>
-            <div class="ml-4 text-left">
-                 <h3 class="text-xl font-bold text-gray-800">Confirm Job Cancellation</h3>
-                 <p id="cancel-modal-text" class="text-gray-600 mt-2"></p>
+            <div class="mt-4 border-t pt-4">
+                <label for="cancel-confirmation-input" class="form-label">To confirm cancellation, please type 'cancel' below.</label>
+                <input id="cancel-confirmation-input" type="text" class="form-input" placeholder="Type 'cancel' to confirm">
             </div>
-        </div>
-        <div class="mt-4 border-t pt-4">
-            <label for="cancel-confirmation-input" class="form-label">To confirm cancellation, please type 'cancel' below.</label>
-            <input id="cancel-confirmation-input" type="text" class="form-input" placeholder="Type 'cancel' to confirm">
-        </div>
-        <div class="flex justify-end gap-4 pt-4">
-            <button onclick="closeCancelModal()" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Back</button>
-            <button id="confirm-cancel-button" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">Confirm Cancellation</button>
+            <div class="flex justify-end gap-4 pt-4">
+                <button onclick="closeCancelModal()" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Back</button>
+                <button id="confirm-cancel-button" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">Confirm Cancellation</button>
+            </div>
         </div>
     </div>
-</div>
 
-
-<div id="complete-confirmation-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
-    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
-    <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
-        <div class="flex items-start">
-            <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
-                <span class="material-symbols-outlined text-green-600">check_circle</span>
+    <div id="complete-confirmation-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+        <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+        <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
+            <div class="flex items-start">
+                <div class="mx-auto flex-shrink-0 flex items-center justify-center h-12 w-12 rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10">
+                    <span class="material-symbols-outlined text-green-600">check_circle</span>
+                </div>
+                <div class="ml-4 text-left">
+                     <h3 class="text-xl font-bold text-gray-800">Confirm Job Completion</h3>
+                     <p id="complete-modal-text" class="text-gray-600 mt-2"></p>
+                </div>
             </div>
-            <div class="ml-4 text-left">
-                 <h3 class="text-xl font-bold text-gray-800">Confirm Job Completion</h3>
-                 <p id="complete-modal-text" class="text-gray-600 mt-2"></p>
+            <div class="mt-4 border-t pt-4">
+                <label for="complete-confirmation-input" class="form-label">To confirm that this job is completed, please type 'yes' below.</label>
+                <input id="complete-confirmation-input" type="text" class="form-input" placeholder="Type 'yes' to confirm">
             </div>
-        </div>
-        <div class="mt-4 border-t pt-4">
-            <label for="complete-confirmation-input" class="form-label">To confirm that this job is completed, please type 'yes' below.</label>
-            <input id="complete-confirmation-input" type="text" class="form-input" placeholder="Type 'yes' to confirm">
-        </div>
-        <div class="flex justify-end gap-4 pt-4">
-            <button onclick="cancelCompletion()" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button>
-            <button id="confirm-complete-button" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold">Confirm Completion</button>
+            <div class="flex justify-end gap-4 pt-4">
+                <button onclick="cancelCompletion()" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button>
+                <button id="confirm-complete-button" class="px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold">Confirm Completion</button>
+            </div>
         </div>
     </div>
-</div>
-
 
     <div id="marks-modal" class="fixed inset-0 bg-black/60 flex items-center justify-center p-4 modal-hidden z-50">
       <div class="bg-white rounded-lg p-4 relative max-w-lg w-full">
         <button onclick="closeMarksModal()" class="absolute -top-2 -right-2 text-white bg-red-600 rounded-full h-8 w-8 flex items-center justify-center font-bold">&times;</button>
         <h2 class="text-lg font-bold mb-2">Damage Marks</h2>
         <div class="relative inline-block">
-  <img src="https://thumbs.dreamstime.com/b/car-line-art-ilustration-vector-car-line-art-ilustration-vector-car-line-art-ilustration-vector-118291586.jpg?w=768"
-       id="modalCarImage" alt="Car Outline with Marks" class="block w-full max-w-sm bg-white" crossorigin="anonymous"/>
-  <canvas id="modalCanvas" class="absolute top-0 left-0"></canvas>
-</div>
+            <img src="https://thumbs.dreamstime.com/b/car-line-art-ilustration-vector-car-line-art-ilustration-vector-car-line-art-ilustration-vector-118291586.jpg?w=768"
+                id="modalCarImage" alt="Car Outline with Marks" class="block w-full max-w-sm bg-white" crossorigin="anonymous"/>
+            <canvas id="modalCanvas" class="absolute top-0 left-0"></canvas>
+        </div>
       </div>
     </div>
     
@@ -982,8 +1050,6 @@
             showError(errorMessage);
             event.preventDefault();
         });
-		
-	
 
 
         // --- Global State ---
@@ -993,8 +1059,8 @@
         let updateableReportsStore = {};
         let currentVehicleId = null;
         let currentReportId = null;
-let allServiceItems = [];
-let originalComplaintTexts = []; // To keep track of which items were original complaints
+        let originalComplaintsForUpdate = [];
+		let newSuggestions = [];
         let requiredMaterials = [];
         let currentComplaints = []; 
         let currentOdometer = 0; 
@@ -1018,7 +1084,7 @@ let originalComplaintTexts = []; // To keep track of which items were original c
 
         // --- OCR SCANNER FUNCTIONS (using OCR.space API) ---
         
-/**
+        /**
          * Resizes and compresses an image file before uploading, ensuring the correct file extension.
          * @param {File} file The original image file.
          * @returns {Promise<File>} A promise that resolves with the new, smaller JPEG image file.
@@ -1202,57 +1268,59 @@ let originalComplaintTexts = []; // To keep track of which items were original c
         
         // --- Media Upload & Recording Functions ---
 
-function handlePhotoUploads(event) {
-    const newFiles = event.target.files;
-    if (!newFiles) return;
-    // Add the newly selected files to our existing array
-    capturedPhotos.push(...Array.from(newFiles));
-    renderPhotoPreviews();
-    // Reset the input so the user can add the same file again if they remove it
-    event.target.value = '';
-}
-// ADD this new function to render the photo previews
-function renderPhotoPreviews() {
-    const previewsContainer = document.getElementById('photo-previews');
-    previewsContainer.innerHTML = ''; // Clear all previews to re-render
-    if (capturedPhotos.length === 0) return;
-    capturedPhotos.forEach((file, index) => {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            const previewWrapper = document.createElement('div');
-            previewWrapper.className = 'relative aspect-square group';
-            previewWrapper.innerHTML = `
-                <img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">
-                <button onclick="removePhoto(${index})" class="absolute top-1 right-1 bg-red-600/80 text-white rounded-full h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                    <span class="material-symbols-outlined text-sm">close</span>
-                </button>
-            `;
-            previewsContainer.appendChild(previewWrapper);
-        };
-        reader.readAsDataURL(file);
-    });
-}
-// ADD this new function to handle removing a photo
-function removePhoto(indexToRemove) {
-    // Remove the photo from our array at the specified index
-    capturedPhotos.splice(indexToRemove, 1);
-    // Re-render the previews to reflect the change
-    renderPhotoPreviews();
-}
+        function handlePhotoUploads(event) {
+            const newFiles = event.target.files;
+            if (!newFiles) return;
+            // Add the newly selected files to our existing array
+            capturedPhotos.push(...Array.from(newFiles));
+            renderPhotoPreviews();
+            // Reset the input so the user can add the same file again if they remove it
+            event.target.value = '';
+        }
+        
+        function renderPhotoPreviews() {
+            const previewsContainer = document.getElementById('photo-previews');
+            previewsContainer.innerHTML = ''; // Clear all previews to re-render
+            if (capturedPhotos.length === 0) return;
+            capturedPhotos.forEach((file, index) => {
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const previewWrapper = document.createElement('div');
+                    previewWrapper.className = 'relative aspect-square group';
+                    previewWrapper.innerHTML = `
+                        <img src="${e.target.result}" class="w-full h-full object-cover rounded-lg">
+                        <button onclick="removePhoto(${index})" class="absolute top-1 right-1 bg-red-600/80 text-white rounded-full h-6 w-6 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="material-symbols-outlined text-sm">close</span>
+                        </button>
+                    `;
+                    previewsContainer.appendChild(previewWrapper);
+                };
+                reader.readAsDataURL(file);
+            });
+        }
 
-    // ADD THIS HELPER FUNCTION
-    function ensureObjectFormat(arr) {
-        if (!arr || !Array.isArray(arr)) return [];
-        return arr.map(item => {
-            if (typeof item === 'string') {
-                return { text: item, cost: 0 }; // Convert old string data
+        function removePhoto(indexToRemove) {
+            // Remove the photo from our array at the specified index
+            capturedPhotos.splice(indexToRemove, 1);
+            // Re-render the previews to reflect the change
+            renderPhotoPreviews();
+        }
+
+        function handleCustomerApprovalRecordingToggle() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                stopRecording('customer');
+            } else {
+                startRecording('customer');
             }
-            // Ensure cost is a number, default to 0 if missing/invalid
-            item.cost = Number(item.cost) || 0;
-            return item;
-        });
-    }
+        }
 
+        function handleRecordingToggle() {
+            if (mediaRecorder && mediaRecorder.state === "recording") {
+                stopRecording('executive'); 
+            } else {
+                startRecording('executive');
+            }
+        }
 
         async function startRecording(context = 'executive') {
             if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
@@ -1276,13 +1344,27 @@ function removePhoto(indexToRemove) {
                 });
 
                 mediaRecorder.start();
-                const recordBtnId = context === 'customer' ? 'customer-record-btn' : 'record-btn';
-                const stopBtnId = context === 'customer' ? 'customer-stop-record-btn' : 'stop-record-btn';
-                const statusId = context === 'customer' ? 'customer-recording-status' : 'recording-status';
+                
+                if (context === 'executive') {
+                    const recordBtn = document.getElementById('record-toggle-btn');
+                    const recordIcon = document.getElementById('record-icon');
+                    const recordText = document.getElementById('record-text');
+                    recordBtn.classList.add('is-recording');
+                    recordBtn.classList.remove('btn-secondary');
+                    recordIcon.textContent = 'stop_circle';
+                    recordText.textContent = 'Stop';
+                    document.getElementById('recording-status').textContent = 'Recording...';
+                } else { // Logic for customer page
+                    const recordBtn = document.getElementById('cust-approval-record-btn');
+                    const recordIcon = document.getElementById('cust-approval-record-icon');
+                    const recordText = document.getElementById('cust-approval-record-text');
+                    recordBtn.classList.add('is-recording');
+                    recordBtn.classList.remove('btn-secondary');
+                    recordIcon.textContent = 'stop_circle';
+                    recordText.textContent = 'Stop';
+                    document.getElementById('customer-recording-status').textContent = 'Recording...';
+                }
 
-                document.getElementById(recordBtnId).classList.add('hidden');
-                document.getElementById(stopBtnId).classList.remove('hidden');
-                document.getElementById(statusId).textContent = 'Recording...';
             } catch (err) {
                 showError('Microphone access was denied.');
                 console.error("Mic Error:", err);
@@ -1292,17 +1374,30 @@ function removePhoto(indexToRemove) {
         function stopRecording(context = 'executive') {
             if (mediaRecorder) {
                 mediaRecorder.stop();
-                 const recordBtnId = context === 'customer' ? 'customer-record-btn' : 'record-btn';
-                const stopBtnId = context === 'customer' ? 'customer-stop-record-btn' : 'stop-record-btn';
-                const statusId = context === 'customer' ? 'customer-recording-status' : 'recording-status';
-
-                document.getElementById(recordBtnId).classList.remove('hidden');
-                document.getElementById(stopBtnId).classList.add('hidden');
-                document.getElementById(statusId).textContent = 'Recording stopped.';
+                
+                if (context === 'executive') {
+                    const recordBtn = document.getElementById('record-toggle-btn');
+                    const recordIcon = document.getElementById('record-icon');
+                    const recordText = document.getElementById('record-text');
+                    recordBtn.classList.remove('is-recording');
+                    recordBtn.classList.add('btn-secondary');
+                    recordIcon.textContent = 'mic';
+                    recordText.textContent = 'Record Note';
+                    document.getElementById('recording-status').textContent = 'Recording stopped.';
+                } else { // Logic for customer page
+                    const recordBtn = document.getElementById('cust-approval-record-btn');
+                    const recordIcon = document.getElementById('cust-approval-record-icon');
+                    const recordText = document.getElementById('cust-approval-record-text');
+                    recordBtn.classList.remove('is-recording');
+                    recordBtn.classList.add('btn-secondary');
+                    recordIcon.textContent = 'mic';
+                    recordText.textContent = 'Record';
+                    document.getElementById('customer-recording-status').textContent = 'Recording stopped.';
+                }
             }
         }
 
-// --- AUTHENTICATION & UTILITIES ---
+        // --- AUTHENTICATION & UTILITIES ---
         const normalizeVehicleNumber = (num) => {
             if (!num) return '';
             const cleaned = num.replace(/[\s\W_]+/g, '').toUpperCase();
@@ -1342,7 +1437,6 @@ function removePhoto(indexToRemove) {
                 document.getElementById('profile-username').textContent = currentUser.username;
                 document.getElementById('profile-role').textContent = currentUser.role;
                 showExecutiveScreen('job-card-screen');
-                // Use a timeout to ensure the Google libraries have loaded.
                 setTimeout(checkInitialAuth, 1000);
             } else {
                 return showError('Unknown user role.');
@@ -1751,21 +1845,21 @@ function removePhoto(indexToRemove) {
             });
         }
 
-	function checkOdometer() {
-        const newOdometerInput = document.getElementById('detail-odometer-input');
-        const warningSpan = document.getElementById('odometer-warning');
-        const newOdometerValue = parseInt(newOdometerInput.value);
+	    function checkOdometer() {
+            const newOdometerInput = document.getElementById('detail-odometer-input');
+            const warningSpan = document.getElementById('odometer-warning');
+            const newOdometerValue = parseInt(newOdometerInput.value);
 
-        if (newOdometerValue < currentOdometer) {
-            warningSpan.textContent = 'Reading is lower than last service!';
-            warningSpan.classList.remove('hidden');
-            newOdometerInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
-        } else {
-            warningSpan.textContent = '';
-            warningSpan.classList.add('hidden');
-            newOdometerInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            if (newOdometerValue < currentOdometer) {
+                warningSpan.textContent = 'Reading is lower than last service!';
+                warningSpan.classList.remove('hidden');
+                newOdometerInput.classList.add('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            } else {
+                warningSpan.textContent = '';
+                warningSpan.classList.add('hidden');
+                newOdometerInput.classList.remove('border-red-500', 'focus:border-red-500', 'focus:ring-red-500');
+            }
         }
-    }
         
         async function createVehicle() {
             const newVehicle = {
@@ -1798,352 +1892,333 @@ function removePhoto(indexToRemove) {
             searchVehicle();
         }
 
-        function addComplaint() {
-            const complaintInput = document.getElementById('complaint-input');
-            const complaintText = complaintInput.value.trim();
-            if (complaintText) {
-                currentComplaints.push(complaintText);
-                complaintInput.value = '';
-                renderComplaints();
-            }
-            complaintInput.focus();
-        }
+        // This version adds a complaint with a default amount of 0.
+function addComplaint() {
+    const complaintInput = document.getElementById('complaint-input');
+    const complaintText = complaintInput.value.trim();
+
+    if (complaintText) {
+        // Add complaint with a default amount of 0. This will be edited on the Update screen.
+        currentComplaints.push({ text: complaintText, amount: 0, type: 'complaint' });
+        complaintInput.value = '';
+        renderComplaints();
+    }
+    complaintInput.focus();
+}
 
         function deleteComplaint(index) {
             currentComplaints.splice(index, 1);
             renderComplaints();
         }
 
-        function renderComplaints() {
-            const list = document.getElementById('complaints-list');
-            list.innerHTML = '';
+        // This version displays only the complaint text, not the amount.
+function renderComplaints() {
+    const list = document.getElementById('complaints-list');
+    list.innerHTML = '';
 
-            if (currentComplaints.length === 0) {
-                list.innerHTML = '<p class="text-sm text-gray-500">No complaints added yet.</p>';
-                return;
-            }
-
-            currentComplaints.forEach((text, index) => {
-                const item = document.createElement('div');
-                item.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg text-sm';
-                item.innerHTML = `
-                    <p class="flex-1 mr-2">${text}</p>
-                    <button onclick="deleteComplaint(${index})" class="text-red-500 hover:text-red-700 shrink-0">
-                        <span class="material-symbols-outlined">delete</span>
-                    </button>
-                `;
-                list.appendChild(item);
-            });
-        }
-        
-
-// ADD this new function
-async function handleDuplicateConfirmation() {
-    const confirmationInput = document.getElementById('duplicate-confirmation-input');
-    if (confirmationInput.value.trim().toLowerCase() === 'yes') {
-        hideModal('duplicate-job-card-modal');
-        confirmationInput.value = ''; // Clear the input
-        await executeSaveComplaints(); // Proceed with saving
-    } else {
-        showError("Confirmation text did not match. Please type 'yes' to proceed.");
-    }
-}
-
-// REPLACE your existing saveComplaints function with this one
-async function saveComplaints() {
-    addComplaint(); 
-    
-    if (currentComplaints.length === 0) return showError('Please add at least one complaint.');
-    if (!currentVehicleId) return showError('No vehicle selected.');
-
-    const today = new Date().toISOString().split('T')[0]; // Format as 'YYYY-MM-DD'
-
-    // THE FIX: We removed .maybeSingle() to get an array of all duplicates.
-    const { data: existingReports, error: checkError } = await sb
-        .from('reports')
-        .select('id, executive_id')
-        .eq('vehicle_id', currentVehicleId)
-        .gte('created_at', `${today} 00:00:00`)
-        .lt('created_at', `${today} 23:59:59`); // <-- No .maybeSingle() modifier here
-
-    if (checkError) {
-        console.error("Error checking for existing report:", checkError);
-        return showError('Could not check for existing job cards. Please try again.');
-    }
-
-    // THE FIX: We now check the length of the array.
-    if (existingReports && existingReports.length > 0) {
-        const firstDuplicate = existingReports[0]; // We only need the first one for the message.
-        let executiveName = 'another executive';
-        
-        const { data: userData } = await sb
-            .from('users')
-            .select('username')
-            .eq('id', firstDuplicate.executive_id)
-            .single();
-
-        if (userData) {
-            executiveName = userData.username;
-        }
-
-        document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
-        showModal('duplicate-job-card-modal');
-        return; // Stop and wait for confirmation
-    }
-    
-    // If no duplicates are found, proceed directly.
-    await executeSaveComplaints();
-}
-
-async function executeSaveComplaints() {
-    const hasMedia = capturedPhotos.length > 0 || voiceNoteBlob;
-
-    if (hasMedia && !gapi.client.getToken()) {
-        showError('Google Drive access required for media. Please authorize.');
-        tokenClient.callback = async (resp) => {
-            if (resp.error !== undefined) {
-                showError('Authorization failed. Please try again.');
-                throw (resp);
-            }
-            updateAuthUI(true);
-            showSuccessMessage('Google Drive authorized. Now saving...');
-            await executeSaveComplaints(); // Retry saving after auth
-        };
-        tokenClient.requestAccessToken({prompt: 'consent'});
+    if (currentComplaints.length === 0) {
+        list.innerHTML = '<p class="text-sm text-gray-500">No complaints added yet.</p>';
         return;
     }
-    
-    const newOdometerInput = document.getElementById('detail-odometer-input');
-    const serviceOdometer = newOdometerInput.value;
 
-    const serviceClientName = document.getElementById('detail-client-name-input').value.trim();
-    const serviceClientPhone = document.getElementById('detail-client-phone-input').value.trim();
-    
-    if (!/^\d{10}$/.test(serviceClientPhone)) {
-        return showError('Please enter a valid 10-digit phone number for the client.');
-    }
-    if (!serviceClientName) {
-        return showError('Client name cannot be empty.');
-    }
-    
-    showSuccessMessage('Saving report...');
+    currentComplaints.forEach((item, index) => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg text-sm';
+        // Display only the text, not the amount, on the Job Card screen.
+        div.innerHTML = `
+            <p class="flex-1 mr-2">${item.text}</p>
+            <button onclick="deleteComplaint(${index})" class="text-red-500 hover:text-red-700 shrink-0">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        `;
+        list.appendChild(div);
+    });
+}
+        
+        async function handleDuplicateConfirmation() {
+            const confirmationInput = document.getElementById('duplicate-confirmation-input');
+            if (confirmationInput.value.trim().toLowerCase() === 'yes') {
+                hideModal('duplicate-job-card-modal');
+                confirmationInput.value = ''; // Clear the input
+                await executeSaveComplaints(); // Proceed with saving
+            } else {
+                showError("Confirmation text did not match. Please type 'yes' to proceed.");
+            }
+        }
 
-    const { data: reportData, error: reportError } = await sb.from('reports').insert({
-        vehicle_id: currentVehicleId,
-        executive_id: currentUser.id,
-        complaint: JSON.stringify(currentComplaints),
-        status: 'Not Started',
-        marks: JSON.stringify(damageMarks),
-        odometer_reading: serviceOdometer,
-        client_name: serviceClientName,
-        client_phone: serviceClientPhone
-    }).select('id').single();
-
-    if(reportError) {
-        console.error("Error saving report:", reportError);
-        return showError(`Failed to save complaints: ${reportError.message}`);
-    }
-
-    const reportId = reportData.id;
-
-    if (hasMedia) {
-        const vehicleNo = document.getElementById('detail-vehicle-number').textContent || `Vehicle-${currentVehicleId}`;
-        const jobFolderName = `${vehicleNo}_${reportId}`;
-
-        try {
-            const folderId = await createDriveFolder(jobFolderName);
+        async function saveComplaints() {
+            addComplaint(); 
             
-            const uploadPromises = [];
-            capturedPhotos.forEach((photo, index) => {
-                uploadPromises.push(uploadFileToDrive(folderId, photo, `photo_${index + 1}.jpg`));
-            });
-            if (voiceNoteBlob) {
-                uploadPromises.push(uploadFileToDrive(folderId, voiceNoteBlob, 'voice_note.webm'));
+            if (currentComplaints.length === 0) return showError('Please add at least one complaint.');
+            if (!currentVehicleId) return showError('No vehicle selected.');
+
+            // --- Check for existing job card ---
+            const today = new Date();
+            today.setHours(0, 0, 0, 0); // Start of today
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
+
+            const { data: existingReport, error: checkError } = await sb
+                .from('reports')
+                .select('id, users ( username )') 
+                .eq('vehicle_id', currentVehicleId)
+                .gte('created_at', today.toISOString())
+                .lt('created_at', tomorrow.toISOString())
+                .maybeSingle();
+
+            if (checkError) {
+                console.error("Error checking for existing report:", checkError);
+                return showError('Could not check for existing job cards. Please try again.');
             }
 
-            await Promise.all(uploadPromises);
+            if (existingReport) {
+                const executiveName = existingReport.users ? existingReport.users.username : 'another executive';
+                document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
+                showModal('duplicate-job-card-modal');
+                return; // Stop here and wait for user confirmation
+            }
             
-            const folderUrl = `https://drive.google.com/drive/folders/${folderId}`;
-            const { error: updateError } = await sb.from('reports').update({ gdrive_folder_url: folderUrl }).eq('id', reportId);
-            if (updateError) throw updateError;
+            // If no duplicate is found, proceed directly
+            await executeSaveComplaints();
+        }
+
+        async function executeSaveComplaints() {
+            const hasMedia = capturedPhotos.length > 0 || voiceNoteBlob;
+
+            if (hasMedia && !gapi.client.getToken()) {
+                showError('Google Drive access required for media. Please authorize.');
+                tokenClient.callback = async (resp) => {
+                    if (resp.error !== undefined) {
+                        showError('Authorization failed. Please try again.');
+                        throw (resp);
+                    }
+                    updateAuthUI(true);
+                    showSuccessMessage('Google Drive authorized. Now saving...');
+                    await executeSaveComplaints(); // Retry saving after auth
+                };
+                tokenClient.requestAccessToken({prompt: 'consent'});
+                return;
+            }
             
-            showSuccessMessage('Media uploaded successfully!');
-        } catch (driveError) {
-            console.error('Google Drive or DB Update Error:', driveError);
-            showError('Report saved, but media upload failed. Check Google Drive authorization.');
+            const newOdometerInput = document.getElementById('detail-odometer-input');
+            const serviceOdometer = newOdometerInput.value;
+
+            const serviceClientName = document.getElementById('detail-client-name-input').value.trim();
+            const serviceClientPhone = document.getElementById('detail-client-phone-input').value.trim();
+            
+            if (!/^\d{10}$/.test(serviceClientPhone)) {
+                return showError('Please enter a valid 10-digit phone number for the client.');
+            }
+            if (!serviceClientName) {
+                return showError('Client name cannot be empty.');
+            }
+            
+            showSuccessMessage('Saving report...');
+
+            const { data: reportData, error: reportError } = await sb.from('reports').insert({
+                vehicle_id: currentVehicleId,
+                executive_id: currentUser.id,
+                complaint: JSON.stringify(currentComplaints),
+                status: 'Not Started',
+                marks: JSON.stringify(damageMarks),
+                odometer_reading: serviceOdometer,
+                client_name: serviceClientName,
+                client_phone: serviceClientPhone
+            }).select('id').single();
+
+            if(reportError) {
+                console.error("Error saving report:", reportError);
+                return showError(`Failed to save complaints: ${reportError.message}`);
+            }
+
+            const reportId = reportData.id;
+
+            if (hasMedia) {
+                const vehicleNo = document.getElementById('detail-vehicle-number').textContent || `Vehicle-${currentVehicleId}`;
+                const jobFolderName = `${vehicleNo}_${reportId}`;
+
+                try {
+                    const folderId = await createDriveFolder(jobFolderName);
+                    
+                    const uploadPromises = [];
+                    capturedPhotos.forEach((photo, index) => {
+                        uploadPromises.push(uploadFileToDrive(folderId, photo, `photo_${index + 1}.jpg`));
+                    });
+                    if (voiceNoteBlob) {
+                        uploadPromises.push(uploadFileToDrive(folderId, voiceNoteBlob, 'voice_note.webm'));
+                    }
+
+                    await Promise.all(uploadPromises);
+                    
+                    const folderUrl = `https://drive.google.com/drive/folders/${folderId}`;
+                    const { error: updateError } = await sb.from('reports').update({ gdrive_folder_url: folderUrl }).eq('id', reportId);
+                    if (updateError) throw updateError;
+                    
+                    showSuccessMessage('Media uploaded successfully!');
+                } catch (driveError) {
+                    console.error('Google Drive or DB Update Error:', driveError);
+                    showError('Report saved, but media upload failed. Check Google Drive authorization.');
+                }
+            }
+
+            const updates = {};
+            const newOdometer = parseInt(serviceOdometer);
+
+            if (newOdometer > currentOdometer) updates.odometer = newOdometer;
+            if (serviceClientName !== originalClientName) updates.client_name = serviceClientName;
+            if (serviceClientPhone !== originalClientPhone) updates.client_phone = serviceClientPhone;
+
+            if (Object.keys(updates).length > 0) {
+                const { error: vehicleUpdateError } = await sb.from('vehicles').update(updates).eq('id', currentVehicleId);
+                 if(vehicleUpdateError) {
+                    console.error("Error updating vehicle details:", vehicleUpdateError);
+                    showError('Report saved, but failed to update vehicle details.');
+                }
+            }
+            
+            showSuccessMessage('Job Card saved successfully!');
+            resetJobCardState();
         }
-    }
 
-    const updates = {};
-    const newOdometer = parseInt(serviceOdometer);
+        async function saveSuggestionsForApproval() {
+            if (!currentReportId) {
+                showError('No report selected.');
+                return false; // Indicate failure
+            }
 
-    if (newOdometer > currentOdometer) updates.odometer = newOdometer;
-    if (serviceClientName !== originalClientName) updates.client_name = serviceClientName;
-    if (serviceClientPhone !== originalClientPhone) updates.client_phone = serviceClientPhone;
+            const allSuggestions = [...new Set(newSuggestions)];
+            const updateData = { suggested: JSON.stringify(allSuggestions) };
 
-    if (Object.keys(updates).length > 0) {
-        const { error: vehicleUpdateError } = await sb.from('vehicles').update(updates).eq('id', currentVehicleId);
-         if(vehicleUpdateError) {
-            console.error("Error updating vehicle details:", vehicleUpdateError);
-            showError('Report saved, but failed to update vehicle details.');
+            const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
+            if (error) {
+                showError(`Failed to save suggestions: ${error.message}`);
+                return false; // Indicate failure
+            }
+            
+            console.log('Suggestions saved for approval link.');
+            return true; // Indicate success
         }
-    }
-    
-    showSuccessMessage('Job Card saved successfully!');
-    resetJobCardState();
-}
-
-
-      // REPLACE this function
-function selectReportForUpdate(report) {
-    document.getElementById('update-tab-container').classList.add('hidden');
-    
-    currentReportId = report.id;
-    
-    document.getElementById('update-detail-number').textContent = report.vehicles.vehicle_no;
-    updateDetailsSection.classList.remove('hidden');
-    updateFormSection.classList.remove('hidden');
-
-    const complaints = ensureObjectFormat(JSON.parse(report.complaint || '[]'));
-    const suggestions = ensureObjectFormat(report.suggested ? JSON.parse(report.suggested) : []);
-    
-    // Store original complaint texts for UI tagging
-    originalComplaintTexts = complaints.map(c => c.text);
-
-    // Combine complaints and suggestions into a single, unique list for editing
-    const combined = [...complaints, ...suggestions];
-    allServiceItems = combined.reduce((acc, current) => {
-        if (!acc.find(item => item.text === current.text)) {
-            acc.push(current);
-        }
-        return acc;
-    }, []);
-
-    const approvedItems = ensureObjectFormat(report.approved ? JSON.parse(report.approved) : []);
-    
-    renderSuggestions(approvedItems);
-    
-    renderMaterials();
-
-    const complaintDisplayList = document.getElementById('original-complaints-list');
-    const complaintSummaryP = document.getElementById('update-detail-complaint');
-    const complaintDisplayDiv = document.getElementById('original-complaints-display');
-    complaintDisplayList.innerHTML = '';
-
-    if (originalComplaintTexts.length > 0) {
-        complaintSummaryP.textContent = `${originalComplaintTexts.length} issue(s) registered.`;
-        originalComplaintTexts.forEach(complaintText => {
-            const li = document.createElement('li');
-            li.textContent = complaintText;
-            complaintDisplayList.appendChild(li);
-        });
-        complaintDisplayDiv.classList.remove('hidden');
-    } else {
-        complaintSummaryP.textContent = 'No complaints registered.';
-        complaintDisplayDiv.classList.add('hidden');
-    }
-
-    const feedbackDisplay = document.getElementById('customer-feedback-display');
-    const feedbackTextDisplay = document.getElementById('customer-feedback-text-display');
-    const feedbackAudioDisplay = document.getElementById('customer-feedback-audio-display');
-
-    feedbackDisplay.classList.add('hidden');
-    feedbackTextDisplay.classList.add('hidden');
-    feedbackAudioDisplay.classList.add('hidden');
-    feedbackTextDisplay.textContent = '';
-    feedbackAudioDisplay.innerHTML = '';
-
-    if (report.customer_feedback_text || report.customer_feedback_audio) {
-        feedbackDisplay.classList.remove('hidden');
-        if (report.customer_feedback_text) {
-            feedbackTextDisplay.textContent = report.customer_feedback_text;
-            feedbackTextDisplay.classList.remove('hidden');
-        }
-        if (report.customer_feedback_audio) {
-            feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
-            feedbackAudioDisplay.classList.remove('hidden');
-        }
-    }
-
-    document.getElementById('delivery-date').value = report.expected_delivery || '';
-    const today = new Date().toISOString().split('T')[0];
-    document.getElementById('delivery-date').setAttribute('min', today);
-
-    const whatsappButton = document.getElementById('send-whatsapp-btn');
-    if (report.approved !== null && report.approved !== '[]') {
-        whatsappButton.style.display = 'none';
-    } else {
-        whatsappButton.style.display = 'flex';
-    }
-}
-
-// REPLACE this function
+        
+        // REPLACE the existing addSuggestion function
 function addSuggestion() {
-    const input = document.getElementById('suggestion-input');
-    const suggestionText = input.value.trim();
+    const suggestionInput = document.getElementById('suggestion-input');
+    const amountInput = document.getElementById('suggestion-amount-input');
+    const suggestionText = suggestionInput.value.trim();
+    const suggestionAmount = parseFloat(amountInput.value) || 0;
+
     if (suggestionText) {
-        // Add to the single master list if it doesn't exist
-        if (!allServiceItems.some(s => s.text === suggestionText)) {
-            allServiceItems.push({ text: suggestionText, cost: 0 });
-        }
-        input.value = '';
+        newSuggestions.push({ text: suggestionText, amount: suggestionAmount, type: 'suggestion' });
+        suggestionInput.value = '';
+        amountInput.value = '';
         
         const approvedItems = [];
         document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
-            approvedItems.push(JSON.parse(checkbox.value));
+            try {
+                approvedItems.push(JSON.parse(checkbox.value));
+            } catch {
+                approvedItems.push(checkbox.value);
+            }
         });
-        renderSuggestions(approvedItems);
+        renderSuggestions(originalComplaintsForUpdate, newSuggestions, approvedItems);
     }
+    suggestionInput.focus();
 }
 
-// REPLACE this function
+// REPLACE the existing deleteSuggestion function
 function deleteSuggestion(index) {
-    allServiceItems.splice(index, 1);
+    newSuggestions.splice(index, 1);
     const approvedItems = [];
     document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
-        approvedItems.push(JSON.parse(checkbox.value));
-    });
-    renderSuggestions(approvedItems);
-}
-
-
-// REPLACE this function
-function updateSuggestionCost(index, cost) {
-    if (allServiceItems[index]) {
-        allServiceItems[index].cost = Number(cost) || 0;
-        const approvedItems = [];
-        document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
+        try {
             approvedItems.push(JSON.parse(checkbox.value));
-        });
-        renderSuggestions(approvedItems);
+        } catch {
+            approvedItems.push(checkbox.value);
+        }
+    });
+    renderSuggestions(originalComplaintsForUpdate, newSuggestions, approvedItems);
+}
+function updateCustomerTotal() {
+    const totalAmountEl = document.getElementById('cust-total-amount');
+    let total = 0;
+    document.querySelectorAll('#approval-suggestions-list input[type="checkbox"]:checked').forEach(checkbox => {
+        try {
+            const item = JSON.parse(checkbox.value);
+            total += item.amount || 0;
+        } catch {}
+    });
+    if (totalAmountEl) {
+        totalAmountEl.textContent = `₹ ${total.toFixed(2)}`;
     }
 }
+// ADD THIS NEW FUNCTION
+// Updates the cost of a complaint in the state array when the executive types in the input field.
+function updateComplaintCost(text, newAmount) {
+    const complaint = originalComplaintsForUpdate.find(c => c.text === text);
+    if (complaint) {
+        complaint.amount = parseFloat(newAmount) || 0;
+    }
+    recalculateAndUpdateTotal();
+}
 
-// REPLACE this function
-function renderSuggestions(approved = []) {
-    const executiveList = document.getElementById('executive-suggestions-list');
-    const customerList = document.getElementById('customer-approval-list');
+// ADD THIS NEW FUNCTION
+// Calculates the total cost from both original complaints and new suggestions and updates the UI.
+function recalculateAndUpdateTotal() {
+    const totalAmountEl = document.getElementById('approx-total-amount');
+    let totalAmount = 0;
     
-    // --- 1. Render the single, unified editable list for the executive ---
-    executiveList.innerHTML = '';
-    if (allServiceItems.length > 0) {
-        allServiceItems.forEach((item, index) => {
-            const isOriginal = originalComplaintTexts.includes(item.text);
-            const tag = isOriginal
-                ? `<span class="text-xs font-semibold text-gray-500">(Customer Request)</span>`
-                : `<span class="text-xs font-semibold text-blue-600">(Mechanic Suggestion)</span>`;
+    // Sum costs from original complaints
+    originalComplaintsForUpdate.forEach(item => {
+        totalAmount += item.amount || 0;
+    });
+    
+    // Sum costs from new mechanic suggestions
+    newSuggestions.forEach(item => {
+        totalAmount += item.amount || 0;
+    });
 
-            const execItem = document.createElement('div');
-            execItem.className = 'flex items-center justify-between gap-2 bg-gray-50 p-2 rounded-lg text-sm';
-            execItem.innerHTML = `
-                <div class="flex-1 mr-2">
-                    <p>${item.text}</p>
-                    ${tag}
+    totalAmountEl.textContent = `₹ ${totalAmount.toFixed(2)}`;
+}
+
+// REPLACE the existing renderSuggestions function
+// REPLACE the existing renderSuggestions function with this one.
+// This function now populates three different lists for better clarity.
+function renderSuggestions(complaints = [], suggestions = [], approved = []) {
+    const executiveList = document.getElementById('executive-suggestions-list');
+    const customerComplaintsList = document.getElementById('customer-complaints-list');
+    const customerApprovalList = document.getElementById('customer-approval-list');
+
+    // 1. Render editable customer complaints
+    customerComplaintsList.innerHTML = '';
+    if (complaints.length > 0) {
+        complaints.forEach((item) => {
+            const sanitizedText = item.text.replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+            const complaintItem = document.createElement('div');
+            complaintItem.className = 'flex items-center justify-between gap-3 p-3 bg-gray-100 rounded-lg';
+            complaintItem.innerHTML = `
+                <div class="flex-1">
+                    <span class="font-medium">${item.text}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="font-bold text-gray-500">₹</span>
-                    <input type="number" value="${item.cost || 0}" oninput="updateSuggestionCost(${index}, this.value)" class="form-input !py-1 !px-2 w-24 text-right" placeholder="Cost">
+                    <input type="number" class="form-input !py-1 !px-2 w-28 text-right" 
+                           value="${item.amount || 0}" placeholder="Cost"
+                           data-text="${sanitizedText}" oninput="updateComplaintCost(this.dataset.text, this.value)">
                 </div>
+            `;
+            customerComplaintsList.appendChild(complaintItem);
+        });
+    } else {
+        customerComplaintsList.innerHTML = '<p class="text-sm text-gray-500">No original complaints were registered.</p>';
+    }
+    
+    // 2. Render newly added mechanic suggestions (with delete buttons)
+    executiveList.innerHTML = '';
+    if (suggestions.length > 0) {
+        suggestions.forEach((item, index) => {
+            const execItem = document.createElement('div');
+            execItem.className = 'flex items-center justify-between bg-gray-50 p-2 rounded-lg text-sm';
+            execItem.innerHTML = `
+                <p class="flex-1 mr-2">${item.text} - <span class="font-bold">₹${item.amount.toFixed(2)}</span></p>
                 <button type="button" onclick="deleteSuggestion(${index})" class="text-red-500 hover:text-red-700 shrink-0">
                     <span class="material-symbols-outlined">delete</span>
                 </button>
@@ -2152,91 +2227,29 @@ function renderSuggestions(approved = []) {
         });
     }
 
-    // --- 2. Render the checkbox list for approval preview ---
-    customerList.innerHTML = '';
-    if (allServiceItems.length > 0) {
-        allServiceItems.forEach(item => {
-            const isApproved = approved.some(a => a.text === item.text);
-            const isOriginal = originalComplaintTexts.includes(item.text);
-
-            const bgColor = isOriginal ? 'bg-gray-100' : 'bg-blue-50';
-            const tag = isOriginal
-                ? `<span class="text-xs text-gray-500">(Customer Request)</span>`
-                : `<span class="text-xs text-blue-600">(Mechanic Suggestion)</span>`;
-
-            const customerItem = document.createElement('label');
-            customerItem.className = `flex items-center gap-3 p-3 ${bgColor} rounded-lg cursor-pointer hover:bg-gray-200 transition-colors`;
-            
-            const itemJSON = JSON.stringify(item);
-
-            customerItem.innerHTML = `
-                <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" value='${itemJSON}' ${isApproved ? 'checked' : ''}>
-                <span class="flex-1 font-medium">${item.text}</span>
-                ${tag}
-                <span class="font-bold text-gray-700">₹${item.cost || 0}</span>
+    // 3. Render mechanic suggestions again, but with checkboxes for approval tracking
+    customerApprovalList.innerHTML = '';
+    if (suggestions.length > 0) {
+        suggestions.forEach(item => {
+            const isApproved = approved.some(approvedItem => (approvedItem.text || approvedItem) === item.text);
+            const checkboxValue = `'${JSON.stringify(item)}'`;
+            const approvalItem = document.createElement('label');
+            approvalItem.className = 'flex items-center gap-3 p-3 bg-blue-50 rounded-lg cursor-pointer hover:bg-blue-100';
+            approvalItem.innerHTML = `
+                <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" value=${checkboxValue} ${isApproved ? 'checked' : ''}>
+                <div class="flex-1 flex justify-between items-center">
+                    <span class="font-medium">${item.text}</span>
+                    <span class="font-bold text-gray-800">₹${(item.amount || 0).toFixed(2)}</span>
+                </div>
             `;
-            customerList.appendChild(customerItem);
+            customerApprovalList.appendChild(approvalItem);
         });
     } else {
-        customerList.innerHTML = '<p class="text-sm text-gray-500">Add suggestions above to see them here for approval.</p>';
-    }
-}
-
-// REPLACE this function
-async function saveVehicleUpdate(shouldReset = true) {
-    if(!currentReportId) return showError('No report selected for update.');
-
-    const deliveryDate = document.getElementById('delivery-date').value;
-    if(!deliveryDate) return showError('Please select an expected delivery date.');
-
-    const approvedItems = [];
-    document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
-        approvedItems.push(JSON.parse(checkbox.value)); 
-    });
-
-    const updateData = {
-        // Save the entire unified list as "suggested"
-        suggested: JSON.stringify(allServiceItems), 
-        approved: JSON.stringify(approvedItems),
-        materials_required: JSON.stringify(requiredMaterials),
-        expected_delivery: deliveryDate,
-        status: 'Ongoing'
-    };
-
-    const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
-    if(error) return showError(`Failed to save update: ${error.message}`);
-
-    showSuccessMessage('Update saved successfully!');
-    if (shouldReset) {
-        resetVehicleUpdateScreen();
-    }
-}
-
-// REPLACE this function
-async function saveSuggestionsForApproval() {
-    if (!currentReportId) {
-        showError('No report selected.');
-        return false;
-    }
-
-    const updateData = {
-        // Save the entire unified list with costs
-        suggested: JSON.stringify(allServiceItems),
-    };
-
-    const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
-    if (error) {
-        showError(`Failed to save suggestions: ${error.message}`);
-        return false;
+        customerApprovalList.innerHTML = '<p class="text-sm text-gray-500">Add mechanic suggestions to see them here for approval.</p>';
     }
     
-    console.log('Suggestions saved for approval link.');
-    return true;
-}  
-
-
-
-
+    recalculateAndUpdateTotal();
+}
 
 
         function addMaterial() {
@@ -2271,56 +2284,78 @@ async function saveSuggestionsForApproval() {
             }
         }
 
+        async function saveVehicleUpdate(shouldReset = true) {
+    if(!currentReportId) return showError('No report selected for update.');
 
+    const deliveryDate = document.getElementById('delivery-date').value;
+    if(!deliveryDate) return showError('Please select an expected delivery date.');
 
+    const approvedItems = [];
+    document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
+        try {
+            approvedItems.push(JSON.parse(checkbox.value));
+        } catch(e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
+    });
 
+    const allSuggestions = [...new Set(newSuggestions)];
 
+    const updateData = {
+        complaint: JSON.stringify(originalComplaintsForUpdate), // KEY CHANGE: Save updated complaints
+        suggested: JSON.stringify(allSuggestions),
+        approved: JSON.stringify(approvedItems),
+        materials_required: JSON.stringify(requiredMaterials),
+        expected_delivery: deliveryDate,
+        status: 'Ongoing'
+    };
 
+    const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
+    if(error) return showError(`Failed to save update: ${error.message}`);
 
+    showSuccessMessage('Update saved successfully!');
+    if (shouldReset) {
+        resetVehicleUpdateScreen();
+    }
+}
 
-
-
-
-
-        
+                
+        // This new version combines all items and costs before creating the link.
 async function sendApprovalLink() {
     if (!currentReportId) { 
         showError('No report is currently selected.'); 
         return; 
     }
     
-    // Step 1: Save the current suggestions to the database.
-    const savedSuccessfully = await saveSuggestionsForApproval();
-    if (!savedSuccessfully) {
-        showError('Could not save suggestions before sending. Please try again.');
-        return;
-    }
+    // CRITICAL FIX: Combine original complaints (with updated amounts) and new suggestions into one list.
+    const allItemsForApproval = [
+        ...originalComplaintsForUpdate,
+        ...newSuggestions
+    ];
 
-    // Step 2: NEW - Automatically update the status to 'Ongoing'
-    const { error: statusUpdateError } = await sb.from('reports')
-        .update({ status: 'Ongoing' })
+    // Now, save this complete list to the 'suggested' column. This becomes the single source of truth for the customer.
+    const { error: saveDataError } = await sb.from('reports')
+        .update({ 
+            suggested: JSON.stringify(allItemsForApproval), // Save the combined list
+            status: 'Ongoing' 
+        })
         .eq('id', currentReportId);
 
-    if (statusUpdateError) {
-        showError('Could not update job status before sending. Please try again.');
-        console.error('Status Update Error:', statusUpdateError);
+    if (saveDataError) {
+        showError('Could not save data for approval. Please try again.');
+        console.error('Save for Approval Error:', saveDataError);
         return;
     }
-
-    // Step 3: Fetch the client's phone number from the report or the vehicle record.
+    
     const { data: reportData, error: reportError } = await sb
         .from('reports')
-        .select('client_phone, vehicles(client_phone)') // Efficiently gets phone from report or vehicle
+        .select('client_phone, vehicles(client_phone)')
         .eq('id', currentReportId)
         .single();
 
     if (reportError) { 
-        console.error("Error fetching report details:", reportError); 
         showError("Could not fetch report details to send the link."); 
         return; 
     }
     
-    // Prioritize the phone number saved with the report, but fall back to the vehicle's main number.
     const clientPhone = reportData.client_phone || reportData.vehicles?.client_phone;
 
     if (!clientPhone) { 
@@ -2328,8 +2363,7 @@ async function sendApprovalLink() {
         return; 
     }
     
-    // Step 4: Construct the WhatsApp message and URL, then open it.
-    const approvalUrl = `https://auto-fix-alpha.vercel.app/?report_id=${currentReportId}`;
+    const approvalUrl = `${window.location.origin}${window.location.pathname}?report_id=${currentReportId}`;
     const messageText = `Dear Customer,\n\nPlease review and approve the suggested repairs for your vehicle using the link below:\n${approvalUrl}\n\nThank you,\nAutoFix Service`;
     
     const encodedText = encodeURIComponent(messageText);
@@ -2337,221 +2371,217 @@ async function sendApprovalLink() {
     
     window.open(whatsappUrl, '_blank');
 
-    // After sending, refresh the view
     showSuccessMessage("Approval link sent and job moved to 'Awaiting Response'.");
     resetVehicleUpdateScreen();
 }
 
+        async function populateNotStartedJobs() {
+            if (!currentUser) {
+                console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
+                document.getElementById('no-pending-jobs-message').classList.remove('hidden');
+                return; 
+            }
 
-async function populateNotStartedJobs() {
-    if (!currentUser) {
-        console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
-        document.getElementById('no-pending-jobs-message').classList.remove('hidden');
-        return; 
-    }
+            const listContainer = document.getElementById('not-started-jobs-list');
+            const noJobsMsg = document.getElementById('no-pending-jobs-message');
+            listContainer.innerHTML = '';
+            noJobsMsg.classList.add('hidden');
 
-    const listContainer = document.getElementById('not-started-jobs-list');
-    const noJobsMsg = document.getElementById('no-pending-jobs-message');
-    listContainer.innerHTML = '';
-    noJobsMsg.classList.add('hidden');
+            const { data: reports, error } = await sb.from('reports')
+                .select(`id, created_at, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
+                .eq('executive_id', currentUser.id)
+                .eq('status', 'Not Started')
+                .order('created_at', { ascending: false });
 
-    const { data: reports, error } = await sb.from('reports')
-        .select(`id, created_at, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
-        .eq('executive_id', currentUser.id)
-        .eq('status', 'Not Started')
-        .order('created_at', { ascending: false });
+            if (error) {
+                console.error("Error fetching not started jobs:", error);
+                showError('Could not fetch pending job cards.');
+                return;
+            }
 
-    if (error) {
-        console.error("Error fetching not started jobs:", error);
-        showError('Could not fetch pending job cards.');
-        return;
-    }
+            if (!reports || reports.length === 0) {
+                noJobsMsg.classList.remove('hidden');
+                return;
+            }
 
-    if (!reports || reports.length === 0) {
-        noJobsMsg.classList.remove('hidden');
-        return;
-    }
+            updateableReportsStore = {};
+            reports.forEach(report => {
+                updateableReportsStore[report.id] = report;
+                const card = document.createElement('div');
+                const vehicle = report.vehicles;
 
-    updateableReportsStore = {}; // Clear before populating
-    reports.forEach(report => {
-        updateableReportsStore[report.id] = report; // Store it
-        const card = document.createElement('div');
-		const vehicle = report.vehicles;
+                const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+                const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
+                const vehicleName = vehicle.vehicle_name || '';
+                const color = vehicle.color || '';
+                
+                const createdDate = new Date(report.created_at).toLocaleDateString('en-GB', {
+                    day: 'numeric', month: 'short', year: 'numeric'
+                });
 
-		const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
-		const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
-		const vehicleName = vehicle.vehicle_name || '';
-		const color = vehicle.color || '';
-        
-        const createdDate = new Date(report.created_at).toLocaleDateString('en-GB', {
-            day: 'numeric', month: 'short', year: 'numeric'
-        });
+                const brandAndModel = `${brand} ${model}`.trim();
+                const descriptionParts = [vehicleName, brandAndModel, color].filter(part => part);
+                const description = descriptionParts.join(' &bull; '); 
 
-		const brandAndModel = `${brand} ${model}`.trim();
-		const descriptionParts = [vehicleName, brandAndModel, color].filter(part => part);
-		const description = descriptionParts.join(' &bull; '); 
+                card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 transition-all flex justify-between items-center';
 
-		card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 transition-all flex justify-between items-center';
+                card.innerHTML = `
+                    <div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
+                        <div class="flex items-center gap-4">
+                            <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+                            <p class="text-xs font-medium text-gray-500">${createdDate}</p>
+                        </div>
+                        <p class="text-sm text-gray-600 mt-1">${description}</p>
+                        <p class="text-xs text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
+                    </div>
+                    <div class="menu-container">
+                        <button class="menu-button p-2 rounded-full hover:bg-gray-100">
+                            <span class="material-symbols-outlined text-gray-500">more_vert</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
+                                <span class="material-symbols-outlined text-red-500">cancel</span>
+                                <span>Cancel Job</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
 
-		card.innerHTML = `
-			<div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
-				<div class="flex items-center gap-4">
-                    <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
-                    <p class="text-xs font-medium text-gray-500">${createdDate}</p>
-                </div>
-				<p class="text-sm text-gray-600 mt-1">${description}</p>
-				<p class="text-xs text-gray-500 mt-1 truncate" title="${formatArrayCell(report.complaint)}"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
-			</div>
-            <div class="menu-container">
-                <button class="menu-button p-2 rounded-full hover:bg-gray-100">
-                    <span class="material-symbols-outlined text-gray-500">more_vert</span>
-                </button>
-                <div class="dropdown-menu">
-                    <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
-                        <span class="material-symbols-outlined text-red-500">cancel</span>
-                        <span>Cancel Job</span>
-                    </a>
-                </div>
-            </div>
-		`;
+                listContainer.appendChild(card);
+            });
+        }
 
-        listContainer.appendChild(card);
-    });
-}
+        function showUpdateTab(tabName) {
+            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
+            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
 
-function showUpdateTab(tabName) {
-    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
-    
-    document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
+            if (tabName === 'pending') {
+                document.getElementById('tab-btn-pending').classList.add('active-tab');
+                document.getElementById('pending-jobs-panel').classList.remove('hidden');
+                populateNotStartedJobs();
+            } else if (tabName === 'awaiting') {
+                document.getElementById('tab-btn-awaiting').classList.add('active-tab');
+                document.getElementById('awaiting-response-panel').classList.remove('hidden');
+                populateAwaitingResponseJobs();
+            } else if (tabName === 'responses') {
+                document.getElementById('tab-btn-responses').classList.add('active-tab');
+                document.getElementById('responses-received-panel').classList.remove('hidden');
+                populateCustomerResponseJobs();
+            }
+        }
+        async function populateCustomerResponseJobs() {
+            const listContainer = document.getElementById('customer-response-list');
+            const noJobsMsg = document.getElementById('no-customer-response-message');
+            listContainer.innerHTML = '';
+            noJobsMsg.classList.add('hidden');
 
-    if (tabName === 'pending') {
-        document.getElementById('tab-btn-pending').classList.add('active-tab');
-        document.getElementById('pending-jobs-panel').classList.remove('hidden');
-        populateNotStartedJobs();
-    } else if (tabName === 'awaiting') {
-        document.getElementById('tab-btn-awaiting').classList.add('active-tab');
-        document.getElementById('awaiting-response-panel').classList.remove('hidden');
-        populateAwaitingResponseJobs();
-    } else if (tabName === 'responses') {
-        document.getElementById('tab-btn-responses').classList.add('active-tab');
-        document.getElementById('responses-received-panel').classList.remove('hidden');
-        populateCustomerResponseJobs();
-    }
-}
-async function populateCustomerResponseJobs() {
-    const listContainer = document.getElementById('customer-response-list');
-    const noJobsMsg = document.getElementById('no-customer-response-message');
-    listContainer.innerHTML = '';
-    noJobsMsg.classList.add('hidden');
+            const { data: reports, error } = await sb.from('reports')
+                .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
+                .eq('executive_id', currentUser.id)
+                .eq('status', 'Ongoing')
+                .not('approved', 'is', null)
+                .neq('approved', '[]')
+                .order('created_at', { ascending: false });
 
-    const { data: reports, error } = await sb.from('reports')
-        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
-        .eq('executive_id', currentUser.id)
-        .eq('status', 'Ongoing')
-        .not('approved', 'is', null)
-	    .neq('approved', '[]')
-        .order('created_at', { ascending: false });
+            if (error) {
+                console.error("Error fetching customer response jobs:", error);
+                return showError('Could not fetch jobs with customer responses.');
+            }
 
-    if (error) {
-        console.error("Error fetching customer response jobs:", error);
-        return showError('Could not fetch jobs with customer responses.');
-    }
+            if (!reports || reports.length === 0) {
+                noJobsMsg.classList.remove('hidden');
+                return;
+            }
 
-    if (!reports || reports.length === 0) {
-        noJobsMsg.classList.remove('hidden');
-        return;
-    }
+            reports.forEach(report => {
+                updateableReportsStore[report.id] = report;
+                const card = document.createElement('div');
+                const approvedCount = (JSON.parse(report.approved || '[]')).length;
 
-    reports.forEach(report => {
-        updateableReportsStore[report.id] = report; // Store it
-        const card = document.createElement('div');
-        const approvedCount = (JSON.parse(report.approved || '[]')).length;
+                card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-green-500 transition-all flex justify-between items-center';
+                const vehicle = report.vehicles;
+                const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+                const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
 
-        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-green-500 transition-all flex justify-between items-center';
-        const vehicle = report.vehicles;
-        const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
-        const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
+                card.innerHTML = `
+                    <div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
+                        <div class="flex justify-between items-center">
+                            <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+                            <p class="text-xs text-gray-500 italic">${brand} ${model}</p>
+                        </div>
+                        <p class="text-sm text-green-700 font-semibold mt-1">${approvedCount} service(s) approved</p>
+                    </div>
+                    <div class="menu-container">
+                        <button class="menu-button p-2 rounded-full hover:bg-gray-100">
+                            <span class="material-symbols-outlined text-gray-500">more_vert</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
+                                <span class="material-symbols-outlined text-red-500">cancel</span>
+                                <span>Cancel Job</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }
 
-        card.innerHTML = `
-            <div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
-                <div class="flex justify-between items-center">
-                    <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
-                    <p class="text-xs text-gray-500 italic">${brand} ${model}</p>
-                </div>
-                <p class="text-sm text-green-700 font-semibold mt-1">${approvedCount} service(s) approved</p>
-            </div>
-            <div class="menu-container">
-                <button class="menu-button p-2 rounded-full hover:bg-gray-100">
-                    <span class="material-symbols-outlined text-gray-500">more_vert</span>
-                </button>
-                <div class="dropdown-menu">
-                    <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
-                        <span class="material-symbols-outlined text-red-500">cancel</span>
-                        <span>Cancel Job</span>
-                    </a>
-                </div>
-            </div>
-        `;
-        listContainer.appendChild(card);
-    });
-}
+        async function populateAwaitingResponseJobs() {
+            const listContainer = document.getElementById('awaiting-response-list');
+            const noJobsMsg = document.getElementById('no-awaiting-response-message');
+            listContainer.innerHTML = '';
+            noJobsMsg.classList.add('hidden');
 
-async function populateAwaitingResponseJobs() {
-    const listContainer = document.getElementById('awaiting-response-list');
-    const noJobsMsg = document.getElementById('no-awaiting-response-message');
-    listContainer.innerHTML = '';
-    noJobsMsg.classList.add('hidden');
+            const { data: reports, error } = await sb.from('reports')
+                .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
+                .eq('executive_id', currentUser.id)
+                .eq('status', 'Ongoing')
+                .not('suggested', 'is', null)
+                .or('approved.is.null,approved.eq.[]') 
+                .order('created_at', { ascending: false });
 
-    const { data: reports, error } = await sb.from('reports')
-        .select(`id, complaint, approved, suggested, customer_feedback_text, customer_feedback_audio, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model))`)
-        .eq('executive_id', currentUser.id)
-        .eq('status', 'Ongoing')
-        .not('suggested', 'is', null)
-        .or('approved.is.null,approved.eq.[]') 
-        .order('created_at', { ascending: false });
+            if (error) {
+                console.error("Error fetching awaiting response jobs:", error);
+                return showError('Could not fetch jobs awaiting customer response.');
+            }
 
-    if (error) {
-        console.error("Error fetching awaiting response jobs:", error);
-        return showError('Could not fetch jobs awaiting customer response.');
-    }
+            if (!reports || reports.length === 0) {
+                noJobsMsg.classList.remove('hidden');
+                return;
+            }
 
-    if (!reports || reports.length === 0) {
-        noJobsMsg.classList.remove('hidden');
-        return;
-    }
+            reports.forEach(report => {
+                updateableReportsStore[report.id] = report; // Store it
+                const card = document.createElement('div');
+                const vehicle = report.vehicles;
+                const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
+                const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
 
-    reports.forEach(report => {
-        updateableReportsStore[report.id] = report; // Store it
-        const card = document.createElement('div');
-        const vehicle = report.vehicles;
-        const brand = vehicle.vehicle_models ? vehicle.vehicle_models.brand : '';
-        const model = vehicle.vehicle_models ? vehicle.vehicle_models.model : '';
-
-        card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 transition-all flex justify-between items-center';
-        card.innerHTML = `
-            <div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
-                <div class="flex justify-between items-center w-full">
-                     <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
-                     <p class="text-xs text-gray-500 italic ml-4">${brand} ${model}</p>
-                </div>
-                <p class="text-sm text-blue-700 font-semibold mt-1">Approval sent to customer</p>
-            </div>
-             <div class="menu-container">
-                <button class="menu-button p-2 rounded-full hover:bg-gray-100">
-                    <span class="material-symbols-outlined text-gray-500">more_vert</span>
-                </button>
-                <div class="dropdown-menu">
-                    <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
-                        <span class="material-symbols-outlined text-red-500">cancel</span>
-                        <span>Cancel Job</span>
-                    </a>
-                </div>
-            </div>
-        `;
-        listContainer.appendChild(card);
-    });
-}		
-
+                card.className = 'p-4 border border-gray-200 rounded-lg hover:shadow-md hover:border-blue-500 transition-all flex justify-between items-center';
+                card.innerHTML = `
+                    <div class="flex-grow cursor-pointer" onclick="selectReportForUpdateById(${report.id})">
+                        <div class="flex justify-between items-center w-full">
+                             <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+                             <p class="text-xs text-gray-500 italic ml-4">${brand} ${model}</p>
+                        </div>
+                        <p class="text-sm text-blue-700 font-semibold mt-1">Approval sent to customer</p>
+                    </div>
+                     <div class="menu-container">
+                        <button class="menu-button p-2 rounded-full hover:bg-gray-100">
+                            <span class="material-symbols-outlined text-gray-500">more_vert</span>
+                        </button>
+                        <div class="dropdown-menu">
+                            <a onclick="openCancelModal(${report.id}, '${vehicle.vehicle_no}')" class="dropdown-item">
+                                <span class="material-symbols-outlined text-red-500">cancel</span>
+                                <span>Cancel Job</span>
+                            </a>
+                        </div>
+                    </div>
+                `;
+                listContainer.appendChild(card);
+            });
+        }		
 		
         // --- EXECUTIVE: DUE DATES ---
         async function populateDueDateScreen() {
@@ -2796,9 +2826,17 @@ async function populateAwaitingResponseJobs() {
             if (!jsonString || jsonString === '[]') return 'N/A';
             try {
                 const arr = JSON.parse(jsonString);
-                return Array.isArray(arr) && arr.length > 0 ? arr.join(', ') : 'N/A';
+                if (Array.isArray(arr) && arr.length > 0) {
+                    // Check if the items are objects with a 'text' property
+                    if (typeof arr[0] === 'object' && arr[0] !== null && 'text' in arr[0]) {
+                        return arr.map(item => item.text).join(', ');
+                    }
+                    // Fallback for arrays of simple strings
+                    return arr.join(', ');
+                }
+                return 'N/A';
             } catch (e) {
-                return jsonString; 
+                return jsonString;
             }
         };
 
@@ -2820,7 +2858,6 @@ async function populateAwaitingResponseJobs() {
             document.getElementById('client-phone-wrapper').innerHTML = `<p id="detail-client-phone" class="font-semibold"></p>`;
             document.getElementById('odometer-display-wrapper').innerHTML = `<p id="detail-odometer" class="font-semibold"></p>`;
             clearDamageCanvas();
-            // Reset media state
             capturedPhotos = [];
             voiceNoteBlob = null;
             document.getElementById('photo-previews').innerHTML = '';
@@ -2828,39 +2865,112 @@ async function populateAwaitingResponseJobs() {
             document.getElementById('recording-status').textContent = '';
         }
 
+       function selectReportForUpdate(report) {
+    document.getElementById('update-tab-container').classList.add('hidden');
+    
+    currentReportId = report.id;
+    
+    document.getElementById('update-detail-number').textContent = report.vehicles.vehicle_no;
+    updateDetailsSection.classList.remove('hidden');
+    updateFormSection.classList.remove('hidden');
 
+    try {
+        let parsedComplaints = JSON.parse(report.complaint || '[]');
+        originalComplaintsForUpdate = parsedComplaints.map(c => 
+            typeof c === 'string' ? { text: c, amount: 0, type: 'complaint' } : c
+        );
+    } catch (e) {
+        originalComplaintsForUpdate = [];
+    }
+    try {
+        let parsedSuggestions = report.suggested ? JSON.parse(report.suggested) : [];
+        newSuggestions = parsedSuggestions.map(s => 
+            typeof s === 'string' ? { text: s, amount: 0, type: 'suggestion' } : s
+        );
+    } catch (e) {
+        newSuggestions = [];
+    }
+    requiredMaterials = report.materials_required ? JSON.parse(report.materials_required) : [];
 
-function selectReportForUpdateById(reportId) {
-    const report = updateableReportsStore[reportId];
-    if (report) {
-        selectReportForUpdate(report);
+    const approvedItems = report.approved ? JSON.parse(report.approved) : [];
+    
+    renderSuggestions(originalComplaintsForUpdate, newSuggestions, approvedItems);
+    renderMaterials();
+
+    const complaintDisplayList = document.getElementById('original-complaints-list');
+    const complaintSummaryP = document.getElementById('update-detail-complaint');
+    const complaintDisplayDiv = document.getElementById('original-complaints-display');
+    complaintDisplayList.innerHTML = '';
+
+    if (originalComplaintsForUpdate.length > 0) {
+        complaintSummaryP.textContent = `${originalComplaintsForUpdate.length} issue(s) registered.`;
+        originalComplaintsForUpdate.forEach(complaint => {
+            const li = document.createElement('li');
+            li.textContent = complaint.text;
+            complaintDisplayList.appendChild(li);
+        });
+        complaintDisplayDiv.classList.remove('hidden');
     } else {
-        console.error(`Report with ID ${reportId} not found in store.`);
-        showError("Could not load report details. Please try again.");
+        complaintSummaryP.textContent = 'No complaints registered.';
+        complaintDisplayDiv.classList.add('hidden');
+    }
+
+    const feedbackDisplay = document.getElementById('customer-feedback-display');
+    const feedbackTextDisplay = document.getElementById('customer-feedback-text-display');
+    const feedbackAudioDisplay = document.getElementById('customer-feedback-audio-display');
+
+    feedbackDisplay.classList.add('hidden');
+    feedbackTextDisplay.classList.add('hidden');
+    feedbackAudioDisplay.classList.add('hidden');
+    feedbackTextDisplay.textContent = '';
+    feedbackAudioDisplay.innerHTML = '';
+
+    if (report.customer_feedback_text || report.customer_feedback_audio) {
+        feedbackDisplay.classList.remove('hidden');
+        if (report.customer_feedback_text) {
+            feedbackTextDisplay.textContent = report.customer_feedback_text;
+            feedbackTextDisplay.classList.remove('hidden');
+        }
+        if (report.customer_feedback_audio) {
+            feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
+            feedbackAudioDisplay.classList.remove('hidden');
+        }
+    }
+
+    document.getElementById('delivery-date').value = report.expected_delivery || '';
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('delivery-date').setAttribute('min', today);
+
+    const whatsappButton = document.getElementById('send-whatsapp-btn');
+    if (report.approved && report.approved !== '[]') {
+        whatsappButton.style.display = 'none';
+    } else {
+        whatsappButton.style.display = 'flex';
     }
 }
-function resetVehicleUpdateScreen() {
-    // Hide update form sections
-    document.getElementById('update-details-section').classList.add('hidden');
-    document.getElementById('update-form-section').classList.add('hidden');
 
-    // Show the tab interface and search bar
-    document.getElementById('update-tab-container').classList.remove('hidden');
-    
+        function selectReportForUpdateById(reportId) {
+            const report = updateableReportsStore[reportId];
+            if (report) {
+                selectReportForUpdate(report);
+            } else {
+                console.error(`Report with ID ${reportId} not found in store.`);
+                showError("Could not load report details. Please try again.");
+            }
+        }
 
-    // Clear old data
-    
-    
-    document.getElementById('delivery-date').value = '';
-    newSuggestions = [];
-    requiredMaterials = [];
-    currentReportId = null;
-    renderSuggestions();
-    renderMaterials();
-    
-    // Set the default view to the 'pending' tab
-    showUpdateTab('pending');
-}
+        function resetVehicleUpdateScreen() {
+            document.getElementById('update-details-section').classList.add('hidden');
+            document.getElementById('update-form-section').classList.add('hidden');
+            document.getElementById('update-tab-container').classList.remove('hidden');
+            document.getElementById('delivery-date').value = '';
+            newSuggestions = [];
+            requiredMaterials = [];
+            currentReportId = null;
+            renderSuggestions();
+            renderMaterials();
+            showUpdateTab('pending');
+        }
 
         // --- Damage Marking Functions ---
         function resizeCanvas() {
@@ -2951,23 +3061,23 @@ function resetVehicleUpdateScreen() {
         }
 
 
-function showExecutiveScreen(screenId) {
-    document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
-    document.getElementById(screenId).style.display = 'block';
-    setActiveNav(screenId);
+        function showExecutiveScreen(screenId) {
+            document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
+            document.getElementById(screenId).style.display = 'block';
+            setActiveNav(screenId);
 
-    if (screenId === 'report-screen') fetchAndPopulateReports(false);
-    if (screenId === 'due-date-screen') populateDueDateScreen();
-    if (screenId === 'job-card-screen') {
-        resetJobCardState();
-    }
-    if (screenId === 'vehicle-update-screen') {
-        resetVehicleUpdateScreen(); // First, clear any previous update state
-        populateNotStartedJobs();   // Then, populate the list of pending jobs
-    }
+            if (screenId === 'report-screen') fetchAndPopulateReports(false);
+            if (screenId === 'due-date-screen') populateDueDateScreen();
+            if (screenId === 'job-card-screen') {
+                resetJobCardState();
+            }
+            if (screenId === 'vehicle-update-screen') {
+                resetVehicleUpdateScreen();
+                populateNotStartedJobs();
+            }
 
-    showScreen('executive-screens');
-}
+            showScreen('executive-screens');
+        }
 
         function setActiveNav(targetId) {
             const headerTitle = document.getElementById('executive-header-title');
@@ -3009,10 +3119,7 @@ function showExecutiveScreen(screenId) {
         }
 
         function checkInitialAuth() {
-            // This function is called when GAPI and GIS libs are loaded, and after login.
-            // It ensures we check for an existing token once everything is ready.
             if (gapiInited && gisInited && sessionStorage.getItem('currentUser')) {
-                // The token might be in the gapi client from a previous session
                 updateAuthUI(gapi.client.getToken() !== null);
             }
         }
@@ -3035,7 +3142,6 @@ function showExecutiveScreen(screenId) {
 
         function handleAuthClick() {
             if (gapi.client.getToken() === null) {
-                // Prompt the user for consent if no token is present
                 tokenClient.requestAccessToken({prompt: 'consent'});
             }
         }
@@ -3078,144 +3184,173 @@ function showExecutiveScreen(screenId) {
         }
 
         // --- Customer Approval Flow ---
+       // This new version correctly displays all items and costs for the customer.
 async function loadApprovalScreen(reportId) {
     document.getElementById('login-screen').style.display = 'none';
     document.getElementById('admin-screens').style.display = 'none';
     document.getElementById('executive-screens').style.display = 'none';
     document.getElementById('customer-approval-screen').classList.add('active-screen');
 
+    // We now only need the 'suggested' column, as it contains the complete list.
     const { data: report, error } = await sb.from('reports')
-        .select(`complaint, suggested, approved, vehicles ( vehicle_no )`)
+        .select(`suggested, approved, vehicles ( vehicle_no )`)
         .eq('id', reportId)
         .single();
 
     if (error || !report) {
         console.error('Error fetching report for approval:', error);
-        showError('Could not load the approval details. The link may be invalid.');
-        document.getElementById('approval-content').innerHTML = '<p class="text-center text-red-600">Could not load report details.</p>';
+        document.getElementById('approval-content').innerHTML = '<p class="text-center text-red-600">Could not load report details. The link may be invalid.</p>';
         return;
     }
 
     document.getElementById('approval-vehicle-no').textContent = report.vehicles.vehicle_no;
 
-    if (report.approved !== null) {
+    if (report.approved && report.approved !== '[]') {
         document.getElementById('approval-content').classList.add('hidden');
         const successMsg = document.getElementById('approval-success-message');
-        
         successMsg.querySelector('h3').textContent = 'Response Already Submitted';
         successMsg.querySelector('p').textContent = 'Thank you, we have already received your feedback for this service request.';
-        
         successMsg.classList.remove('hidden');
         document.querySelector('#customer-approval-card h2').textContent = 'Response Received';
     } else {
         const suggestionsList = document.getElementById('approval-suggestions-list');
         suggestionsList.innerHTML = '';
         try {
-            const complaints = JSON.parse(report.complaint || '[]');
-            const suggestions = JSON.parse(report.suggested || '[]');
-            const allItems = [...new Set([...complaints, ...suggestions])];
+            // This now gets the complete, correct list from the 'suggested' column
+            const allItems = JSON.parse(report.suggested || '[]');
 
             if (allItems.length > 0) {
-                allItems.forEach(text => {
-                    const isComplaint = complaints.includes(text);
-                    const tag = isComplaint 
-                        ? `<span class="text-xs text-gray-500">(Customer Request)</span>`
+                 allItems.forEach(item => {
+                    const isOriginalComplaint = item.type === 'complaint';
+                    const label = document.createElement('label');
+                    const bgColor = isOriginalComplaint ? 'bg-gray-100' : 'bg-blue-50';
+                    const tag = isOriginalComplaint 
+                        ? `<span class="text-xs text-gray-500">(Your Request)</span>` 
                         : `<span class="text-xs text-blue-600">(Mechanic Suggestion)</span>`;
                     
-                    const item = document.createElement('label');
-                    item.className = 'flex items-center gap-3 p-3 bg-gray-100 rounded-lg cursor-pointer hover:bg-gray-200 transition-colors';
-                    item.innerHTML = `
-                        <input type="checkbox" class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" value="${text}">
+                    // CRITICAL FIX: Display amount as text, not an input field.
+                    const amountDisplay = `<span class="font-bold text-gray-800">₹${(item.amount || 0).toFixed(2)}</span>`;
+                    const checkboxValue = `'${JSON.stringify(item)}'`;
+
+                    label.className = `flex items-center gap-3 p-3 ${bgColor} rounded-lg cursor-pointer hover:bg-gray-200 transition-colors`;
+                    label.innerHTML = `
+                        <input type="checkbox" value=${checkboxValue} class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateCustomerTotal()">
                         <div class="flex-1 flex justify-between items-center">
-                            <span class="text-sm font-medium">${text}</span>
-                            ${tag}
+                             <span class="text-sm font-medium">${item.text}</span>
+                             ${amountDisplay}
                         </div>
+                        ${tag}
                     `;
-                    suggestionsList.appendChild(item);
+                    suggestionsList.appendChild(label);
                 });
             } else {
-                suggestionsList.innerHTML = '<p class="text-sm text-gray-500">No complaints or repairs were suggested.</p>';
+                suggestionsList.innerHTML = '<p class="text-sm text-gray-500">No specific repairs were suggested.</p>';
             }
         } catch (e) {
-            console.error("Error parsing suggestions/complaints:", e);
-            suggestionsList.innerHTML = '<p class="text-sm text-red-500">Could not display repair details.</p>';
+            console.error("Error parsing items for approval:", e);
+            suggestionsList.innerHTML = '<p class="text-sm text-red-500">Could not display suggested repairs.</p>';
         }
+        updateCustomerTotal();
     }
 }
 
-        async function submitCustomerFeedback() {
+
+async function submitCustomerFeedback() {
+            // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+            const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-XXt-0gyhrTONQQbst8GapT1QknCD1mpX3shbdNBt97aLqEFFjfO4r5Si5HI5A73f/exec";
+
             const params = new URLSearchParams(window.location.search);
             const reportId = params.get('report_id');
             if (!reportId) {
                 return showError("Invalid session. Report ID not found.");
             }
 
+            // --- First, save the text feedback and approvals to Supabase ---
+            // (We separate this from the file upload)
             const approvedItems = [];
             document.querySelectorAll('#approval-suggestions-list input[type="checkbox"]:checked').forEach(checkbox => {
-                approvedItems.push(checkbox.value);
+                try { approvedItems.push(JSON.parse(checkbox.value)); } catch {}
             });
-
             const feedbackText = document.getElementById('customer-feedback-text').value.trim();
-            
             const updateData = {
                 approved: JSON.stringify(approvedItems),
-                customer_feedback_text: feedbackText,
+                customer_feedback_text: feedbackText
             };
-
+            
             showSuccessMessage('Submitting your response...');
-
-            if (voiceNoteBlob) {
-                try {
-                    const filePath = `feedback_audio/report_${reportId}_${Date.now()}.webm`;
-                    // Note: Ensure you have a 'autofix-media' bucket with public access for this to work.
-                    const { error: uploadError } = await sb.storage
-                        .from('autofix-media')
-                        .upload(filePath, voiceNoteBlob);
-
-                    if (uploadError) throw uploadError;
-
-                    const { data: urlData } = sb.storage.from('autofix-media').getPublicUrl(filePath);
-                    updateData.customer_feedback_audio = urlData.publicUrl;
-
-                } catch (error) {
-                    console.error('Audio upload error:', error);
-                    showError('Could not upload your voice note. Please try again.');
-                    return; 
-                }
-            }
             
             const { error } = await sb.from('reports').update(updateData).eq('id', reportId);
-
             if (error) {
-                console.error('Error submitting feedback:', error);
+                console.error('Error submitting feedback text:', error);
                 return showError('Failed to submit your response. Please try again.');
             }
-            
+
+            // --- Second, if there is a voice note, upload it via the Apps Script ---
+            if (voiceNoteBlob) {
+                try {
+                    // We need the vehicle number to create the folder name
+                    const { data: reportData, error: fetchError } = await sb.from('reports')
+                        .select('vehicles(vehicle_no)').eq('id', reportId).single();
+                    if (fetchError) throw new Error("Could not get vehicle details for upload.");
+
+                    const vehicleNo = reportData.vehicles.vehicle_no;
+
+                    // Convert the blob to a base64 string to send it
+                    const reader = new FileReader();
+                    reader.readAsDataURL(voiceNoteBlob);
+                    reader.onloadend = async () => {
+                        const base64data = reader.result;
+
+                        const formData = new FormData();
+                        formData.append("file", base64data);
+                        formData.append("mimeType", voiceNoteBlob.type);
+                        formData.append("fileName", `customer_voice_note_${reportId}.webm`);
+                        formData.append("reportId", reportId);
+                        formData.append("vehicleNo", vehicleNo);
+
+                        const response = await fetch(SCRIPT_URL, {
+                            method: "POST",
+                            body: formData,
+                        });
+                        
+                        const result = await response.json();
+                        if(result.status !== 'success') {
+                           throw new Error(result.message || "Upload failed.");
+                        }
+                        console.log("Voice note uploaded successfully via Apps Script.");
+                    };
+                } catch (uploadError) {
+                    console.error('Voice note upload failed:', uploadError);
+                    showError('Your approvals were saved, but the voice note failed to upload.');
+                }
+            }
+
+            // --- Finally, show the success screen ---
             document.getElementById('approval-content').classList.add('hidden');
             document.getElementById('approval-success-message').classList.remove('hidden');
         }
+		
+		
 
-document.addEventListener('DOMContentLoaded', () => {
-    const params = new URLSearchParams(window.location.search);
-    const reportId = params.get('report_id');
+        document.addEventListener('DOMContentLoaded', () => {
+            const params = new URLSearchParams(window.location.search);
+            const reportId = params.get('report_id');
 
-    if (reportId) {
-        // If a report_id exists, it's a customer link. Load ONLY this and stop.
-        loadApprovalScreen(reportId);
-    } else {
-        // Otherwise, it's the main app. Proceed to check for a logged-in user.
-        const savedUser = sessionStorage.getItem('currentUser');
-        if (savedUser) {
-            currentUser = JSON.parse(savedUser);
-            if (currentUser.role === 'admin') {
-                showAdminScreen('admin-dashboard-screen');
-            } else if (currentUser.role === 'executive') {
-                document.getElementById('profile-username').textContent = currentUser.username;
-                document.getElementById('profile-role').textContent = currentUser.role;
-                showExecutiveScreen('job-card-screen');
+            if (reportId) {
+                loadApprovalScreen(reportId);
+            } else {
+                const savedUser = sessionStorage.getItem('currentUser');
+                if (savedUser) {
+                    currentUser = JSON.parse(savedUser);
+                    if (currentUser.role === 'admin') {
+                        showAdminScreen('admin-dashboard-screen');
+                    } else if (currentUser.role === 'executive') {
+                        document.getElementById('profile-username').textContent = currentUser.username;
+                        document.getElementById('profile-role').textContent = currentUser.role;
+                        showExecutiveScreen('job-card-screen');
+                    }
+                }
             }
-        }
-    }
 
             carImage = document.getElementById("carImage");
             damageCanvas = document.getElementById("damageCanvas");
@@ -3275,18 +3410,24 @@ document.addEventListener('DOMContentLoaded', () => {
                 const list = document.getElementById(listId);
                 list.innerHTML = '';
                 try {
-                    const items = JSON.parse(dataString);
+                    const items = JSON.parse(dataString || '[]'); // Safely parse the data
                     if (items && items.length > 0) {
                         items.forEach(item => {
                             const li = document.createElement('li');
-                            li.textContent = item;
+                            // **THE FIX: Check if the item is an object and use its .text property**
+                            if (typeof item === 'object' && item !== null && item.text) {
+                                li.textContent = item.text;
+                            } else {
+                                // Fallback for older data that might just be strings
+                                li.textContent = item;
+                            }
                             list.appendChild(li);
                         });
                     } else {
                         list.innerHTML = '<li>N/A</li>';
                     }
-                } catch(e) {
-                    list.innerHTML = '<li>N/A</li>';
+                } catch (e) {
+                    list.innerHTML = '<li>Error loading data</li>';
                 }
             };
             populateList('print-complaints-list', reportData.complaint);
@@ -3328,73 +3469,67 @@ document.addEventListener('DOMContentLoaded', () => {
         }
 
 		function downloadReport() {
-    const isAdminScreenActive = document.getElementById('admin-screens').classList.contains('active-screen');
-    const table = isAdminScreenActive 
-        ? document.querySelector('#admin-reports-screen .report-table') 
-        : document.querySelector('#report-screen .report-table');
+            const isAdminScreenActive = document.getElementById('admin-screens').classList.contains('active-screen');
+            const table = isAdminScreenActive 
+                ? document.querySelector('#admin-reports-screen .report-table') 
+                : document.querySelector('#report-screen .report-table');
 
-    if (!table) {
-        showError('Could not find the report table.');
-        return;
-    }
-
-    const rows = table.querySelectorAll('tr');
-    if (rows.length <= 1) { 
-        showError('No data available to download.');
-        return;
-    }
-
-    let csv = [];
-    
-    const formatCell = (cellText) => {
-        let text = cellText.replace(/"/g, '""');
-        if (text.search(/("|,|\n)/g) >= 0) {
-            text = `"${text}"`;
-        }
-        return text;
-    };
-
-    const headers = [];
-    rows[0].querySelectorAll('th').forEach(th => {
-        headers.push(formatCell(th.textContent.trim()));
-    });
-    csv.push(headers.join(','));
-
-    for (let i = 1; i < rows.length; i++) {
-        const row = [], cols = rows[i].querySelectorAll('td');
-        for (let j = 0; j < cols.length; j++) {
-            if (j === 0) { 
-                row.push(formatCell(cols[j].querySelector('span:last-child').textContent.trim()));
-            } else if (cols[j].querySelector('button') || cols[j].querySelector('audio')) {
-                 row.push('See in App');
-            } else {
-                 row.push(formatCell(cols[j].textContent.trim()));
+            if (!table) {
+                showError('Could not find the report table.');
+                return;
             }
-        }
-        csv.push(row.join(','));
-    }
 
-    const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
-    const downloadLink = document.createElement('a');
-    
-    const today = new Date().toISOString().slice(0, 10);
-    downloadLink.download = `AutoFix_Report_${today}.csv`;
-    downloadLink.href = window.URL.createObjectURL(csvFile);
-    downloadLink.style.display = 'none';
-    document.body.appendChild(downloadLink);
-    downloadLink.click();
-    document.body.removeChild(downloadLink);
-    
-    showSuccessMessage("Report is downloading...");
-}
+            const rows = table.querySelectorAll('tr');
+            if (rows.length <= 1) { 
+                showError('No data available to download.');
+                return;
+            }
+
+            let csv = [];
+            
+            const formatCell = (cellText) => {
+                let text = cellText.replace(/"/g, '""');
+                if (text.search(/("|,|\n)/g) >= 0) {
+                    text = `"${text}"`;
+                }
+                return text;
+            };
+
+            const headers = [];
+            rows[0].querySelectorAll('th').forEach(th => {
+                headers.push(formatCell(th.textContent.trim()));
+            });
+            csv.push(headers.join(','));
+
+            for (let i = 1; i < rows.length; i++) {
+                const row = [], cols = rows[i].querySelectorAll('td');
+                for (let j = 0; j < cols.length; j++) {
+                    if (j === 0) { 
+                        row.push(formatCell(cols[j].querySelector('span:last-child').textContent.trim()));
+                    } else if (cols[j].querySelector('button') || cols[j].querySelector('audio')) {
+                         row.push('See in App');
+                    } else {
+                         row.push(formatCell(cols[j].textContent.trim()));
+                    }
+                }
+                csv.push(row.join(','));
+            }
+
+            const csvFile = new Blob([csv.join('\n')], { type: 'text/csv' });
+            const downloadLink = document.createElement('a');
+            
+            const today = new Date().toISOString().slice(0, 10);
+            downloadLink.download = `AutoFix_Report_${today}.csv`;
+            downloadLink.href = window.URL.createObjectURL(csvFile);
+            downloadLink.style.display = 'none';
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            
+            showSuccessMessage("Report is downloading...");
+        }
     </script>
     <script async defer src="https://apis.google.com/js/api.js" onload="gapiLoaded()"></script>
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
-
-
-
-
-
-
