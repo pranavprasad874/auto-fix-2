@@ -1396,6 +1396,46 @@
                 }
             }
         }
+		
+
+/**
+         * Finds the customer's voice note in Google Drive and adds a "Play" button to the UI.
+         * @param {string} gdriveFolderUrl The full URL of the Google Drive folder for the report.
+         * @param {HTMLElement} targetElement The div where the play button should be injected.
+         */
+        async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
+            targetElement.innerHTML = ''; // Clear previous content
+            if (!gdriveFolderUrl || !gapi.client.getToken()) {
+                return; // No folder or not authenticated
+            }
+
+            try {
+                const folderId = gdriveFolderUrl.split('/').pop();
+                
+                // Use the Drive API to search for the specific customer voice note file in the folder
+                const response = await gapi.client.drive.files.list({
+                    q: `'${folderId}' in parents and name contains 'customer_feedback_voice_note'`,
+                    fields: 'files(id, name, webViewLink)',
+                    pageSize: 1
+                });
+
+                if (response.result.files && response.result.files.length > 0) {
+                    const audioFile = response.result.files[0];
+                    // Create a button that links directly to the file in Google Drive
+                    targetElement.innerHTML = `
+                        <a href="${audioFile.webViewLink}" target="_blank" class="btn-secondary !w-auto !py-2 !px-4 text-sm flex items-center gap-2">
+                            <span class="material-symbols-outlined">play_circle</span>
+                            Play Customer Voice Note
+                        </a>`;
+                    targetElement.classList.remove('hidden');
+                }
+            } catch (error) {
+                console.error("Error finding customer audio in Google Drive:", error);
+                targetElement.innerHTML = '<p class="text-xs text-red-500">Could not load audio file from Drive.</p>';
+            }
+        }
+		
+
 
         // --- AUTHENTICATION & UTILITIES ---
         const normalizeVehicleNumber = (num) => {
@@ -2925,17 +2965,15 @@ async function sendApprovalLink() {
     feedbackTextDisplay.textContent = '';
     feedbackAudioDisplay.innerHTML = '';
 
-    if (report.customer_feedback_text || report.customer_feedback_audio) {
-        feedbackDisplay.classList.remove('hidden');
-        if (report.customer_feedback_text) {
-            feedbackTextDisplay.textContent = report.customer_feedback_text;
-            feedbackTextDisplay.classList.remove('hidden');
+if (report.customer_feedback_text || report.gdrive_folder_url) {
+            feedbackDisplay.classList.remove('hidden');
+            if (report.customer_feedback_text) {
+                feedbackTextDisplay.textContent = report.customer_feedback_text;
+                feedbackTextDisplay.classList.remove('hidden');
+            }
+            // ADD THIS LINE: Call the new function to find and display the audio button
+            findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay);
         }
-        if (report.customer_feedback_audio) {
-            feedbackAudioDisplay.innerHTML = `<audio controls src="${report.customer_feedback_audio}" class="w-full"></audio>`;
-            feedbackAudioDisplay.classList.remove('hidden');
-        }
-    }
 
     document.getElementById('delivery-date').value = report.expected_delivery || '';
     const today = new Date().toISOString().split('T')[0];
