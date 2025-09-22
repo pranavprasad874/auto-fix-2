@@ -3287,50 +3287,75 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
         }
 
 
-        async function submitCustomerFeedback() {
+async function submitCustomerFeedback() {
+    // PASTE YOUR GOOGLE APPS SCRIPT WEB APP URL HERE
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby-XXt-0gyhrTONQQbst8GapT1QknCD1mpX3shbdNBt97aLqEFFjfO4r5Si5HI5A73f/exec";
+
     const params = new URLSearchParams(window.location.search);
     const reportId = params.get('report_id');
     if (!reportId) {
         return showError("Invalid session. Report ID not found.");
     }
 
+    // --- First, save the text feedback and approvals to Supabase ---
     const approvedItems = [];
     document.querySelectorAll('#approval-suggestions-list input[type="checkbox"]:checked').forEach(checkbox => {
-        try {
-            approvedItems.push(JSON.parse(checkbox.value));
-        } catch {}
+        try { approvedItems.push(JSON.parse(checkbox.value)); } catch {}
     });
-
     const feedbackText = document.getElementById('customer-feedback-text').value.trim();
-    
     const updateData = {
         approved: JSON.stringify(approvedItems),
         customer_feedback_text: feedbackText,
+        customer_feedback_audio: null // Clear the old Supabase audio field
     };
-
+    
     showSuccessMessage('Submitting your response...');
-
-    if (voiceNoteBlob) {
-        try {
-            const filePath = `feedback_audio/report_${reportId}_${Date.now()}.webm`;
-            const { error: uploadError } = await sb.storage.from('autofix-media').upload(filePath, voiceNoteBlob);
-            if (uploadError) throw uploadError;
-            const { data: urlData } = sb.storage.from('autofix-media').getPublicUrl(filePath);
-            updateData.customer_feedback_audio = urlData.publicUrl;
-        } catch (error) {
-            console.error('Audio upload error:', error);
-            showError('Could not upload your voice note. Please try again.');
-            return; 
-        }
-    }
     
     const { error } = await sb.from('reports').update(updateData).eq('id', reportId);
-
     if (error) {
-        console.error('Error submitting feedback:', error);
-        return showError('Failed to submit your response. Please try again.');
+        return showError('Failed to submit your text response. Please try again.');
     }
-    
+
+    // --- Second, if there is a voice note, upload it via the Apps Script ---
+    if (voiceNoteBlob) {
+        try {
+            const { data: reportData, error: fetchError } = await sb.from('reports')
+                .select('gdrive_folder_url, vehicles(vehicle_no)').eq('id', reportId).single();
+            if (fetchError) throw new Error("Could not get vehicle details for upload.");
+
+            const vehicleNo = reportData.vehicles.vehicle_no;
+
+            // Update the report with the GDrive folder URL if it doesn't exist yet
+            if (!reportData.gdrive_folder_url) {
+                const folderName = `${vehicleNo}_${reportId}`;
+                const fileMetadata = { name: folderName, mimeType: 'application/vnd.google-apps.folder', parents: [PARENT_FOLDER_ID] };
+                // NOTE: This part still requires an authorized executive GAPI token to work. A true "only Google" solution would pre-create the folder.
+                const response = await gapi.client.drive.files.create({ resource: fileMetadata, fields: 'id' });
+                const folderUrl = `https://drive.google.com/drive/folders/${response.result.id}`;
+                await sb.from('reports').update({ gdrive_folder_url: folderUrl }).eq('id', reportId);
+            }
+
+            const reader = new FileReader();
+            reader.readAsDataURL(voiceNoteBlob);
+            reader.onloadend = async () => {
+                const base64data = reader.result;
+                const formData = new FormData();
+                formData.append("file", base64data);
+                formData.append("mimeType", voiceNoteBlob.type);
+                formData.append("fileName", `customer_voice_note_${reportId}.webm`);
+                formData.append("reportId", reportId);
+                formData.append("vehicleNo", vehicleNo);
+
+                const response = await fetch(SCRIPT_URL, { method: "POST", body: formData });
+                const result = await response.json();
+                if(result.status !== 'success') { throw new Error(result.message); }
+            };
+        } catch (uploadError) {
+            console.error('Voice note upload failed:', uploadError);
+            showError('Your approvals were saved, but the voice note failed to upload.');
+        }
+    }
+
     document.getElementById('approval-content').classList.add('hidden');
     document.getElementById('approval-success-message').classList.remove('hidden');
 }
@@ -3536,4 +3561,5 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
