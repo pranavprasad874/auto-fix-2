@@ -1371,6 +1371,23 @@
             }
         }
 
+/**
+ * Safely retrieves and parses the current user from session storage.
+ * @returns {object|null} The user object or null if not found.
+ */
+function getCurrentUser() {
+    const savedUser = sessionStorage.getItem('currentUser');
+    if (savedUser) {
+        try {
+            return JSON.parse(savedUser);
+        } catch (e) {
+            console.error("Could not parse user from session storage.", e);
+            return null;
+        }
+    }
+    return null;
+}
+
         function stopRecording(context = 'executive') {
             if (mediaRecorder) {
                 mediaRecorder.stop();
@@ -1958,25 +1975,27 @@ function renderComplaints() {
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
 
-            const { data: existingReport, error: checkError } = await sb
-                .from('reports')
-                .select('id, users ( username )') 
-                .eq('vehicle_id', currentVehicleId)
-                .gte('created_at', today.toISOString())
-                .lt('created_at', tomorrow.toISOString())
-                .maybeSingle();
+// Check for any existing reports for this vehicle today
+const { data: existingReports, error: checkError } = await sb
+    .from('reports')
+    .select('id, users ( username )')
+    .eq('vehicle_id', currentVehicleId)
+    .gte('created_at', today.toISOString())
+    .lt('created_at', tomorrow.toISOString());
 
-            if (checkError) {
-                console.error("Error checking for existing report:", checkError);
-                return showError('Could not check for existing job cards. Please try again.');
-            }
+if (checkError) {
+    console.error("Error checking for existing report:", checkError);
+    return showError('Could not check for existing job cards. Please try again.');
+}
 
-            if (existingReport) {
-                const executiveName = existingReport.users ? existingReport.users.username : 'another executive';
-                document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
-                showModal('duplicate-job-card-modal');
-                return; // Stop here and wait for user confirmation
-            }
+// If we found one or more reports, show the warning
+if (existingReports && existingReports.length > 0) {
+    const firstExistingReport = existingReports[0]; // Use the first one for the message
+    const executiveName = firstExistingReport.users ? firstExistingReport.users.username : 'another executive';
+    document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
+    showModal('duplicate-job-card-modal');
+    return; // Stop and wait for user confirmation
+}
             
             // If no duplicate is found, proceed directly
             await executeSaveComplaints();
@@ -3533,4 +3552,5 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
