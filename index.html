@@ -1644,10 +1644,8 @@
                     mediaLink = `<a href="${row.gdrive_folder_url}" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs font-semibold">View Files</a>`;
                 }
 
-                let customerVoiceCell = 'N/A';
-                if (row.customer_feedback_audio) {
-                    customerVoiceCell = `<audio controls src="${row.customer_feedback_audio}" class="w-48 h-8"></audio>`;
-                }
+				// This now creates a placeholder div that we will fill in later.
+				let customerVoiceCell = `<div id="customer-audio-cell-${row.id}">N/A</div>`;
 
                 tr.innerHTML = `
                     <td class="flex items-center gap-x-2">
@@ -1676,6 +1674,18 @@
                 `;
                 tableBody.appendChild(tr);
             });
+				// START OF NEW CODE TO ADD
+				// After the table is built, check Google Drive for each report's audio
+				data.forEach(row => {
+					if (row.gdrive_folder_url) {
+						const targetCell = document.getElementById(`customer-audio-cell-${row.id}`);
+						if (targetCell) {
+							// We reuse the same helper function to find the audio and add a button
+							findAndDisplayCustomerAudio(row.gdrive_folder_url, targetCell);
+						}
+					}
+				});
+				// END OF NEW CODE
         }
         
         function applyAdminReportFilters() { fetchAndPopulateReports(true); }
@@ -2959,15 +2969,17 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
             feedbackTextDisplay.textContent = '';
             feedbackAudioDisplay.innerHTML = '';
 
+			// START OF REPLACEMENT
             if (report.customer_feedback_text || report.gdrive_folder_url) {
-			    feedbackDisplay.classList.remove('hidden');
-			    if (report.customer_feedback_text) {
-			        feedbackTextDisplay.textContent = report.customer_feedback_text;
-			        feedbackTextDisplay.classList.remove('hidden');
-			    }
-			    // This new line calls the function to find and display the audio button
-			    findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay);
-			}
+                feedbackDisplay.classList.remove('hidden');
+                if (report.customer_feedback_text) {
+                    feedbackTextDisplay.textContent = report.customer_feedback_text;
+                    feedbackTextDisplay.classList.remove('hidden');
+                }
+                // This line now correctly looks in Google Drive for the audio
+                findAndDisplayCustomerAudio(report.gdrive_folder_url, feedbackAudioDisplay);
+            }
+            // END OF REPLACEMENT
 
             document.getElementById('delivery-date').value = report.expected_delivery || '';
             const today = new Date().toISOString().split('T')[0];
@@ -3561,5 +3573,6 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
