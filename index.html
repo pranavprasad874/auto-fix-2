@@ -1968,7 +1968,7 @@ function renderComplaints() {
             }
         }
 
-        async function saveComplaints() {
+async function saveComplaints() {
             addComplaint(); 
             
             if (currentComplaints.length === 0) return showError('Please add at least one complaint.');
@@ -1980,25 +1980,29 @@ function renderComplaints() {
             const tomorrow = new Date(today);
             tomorrow.setDate(tomorrow.getDate() + 1); // Start of tomorrow
 
-            const { data: existingReport, error: checkError } = await sb
+            // START OF THE FIX
+            // Check for any existing reports for this vehicle today
+            const { data: existingReports, error: checkError } = await sb
                 .from('reports')
-                .select('id, users ( username )') 
+                .select('id, users ( username )')
                 .eq('vehicle_id', currentVehicleId)
                 .gte('created_at', today.toISOString())
-                .lt('created_at', tomorrow.toISOString())
-                .maybeSingle();
+                .lt('created_at', tomorrow.toISOString());
 
             if (checkError) {
                 console.error("Error checking for existing report:", checkError);
                 return showError('Could not check for existing job cards. Please try again.');
             }
 
-            if (existingReport) {
-                const executiveName = existingReport.users ? existingReport.users.username : 'another executive';
+            // If we found one or more reports, show the warning
+            if (existingReports && existingReports.length > 0) {
+                const firstExistingReport = existingReports[0]; // Use the first one for the message
+                const executiveName = firstExistingReport.users ? firstExistingReport.users.username : 'another executive';
                 document.getElementById('duplicate-modal-text').textContent = `A job card for this vehicle was already created today by ${executiveName}. Are you sure you want to create another one?`;
                 showModal('duplicate-job-card-modal');
-                return; // Stop here and wait for user confirmation
+                return; // Stop and wait for user confirmation
             }
+            // END OF THE FIX
             
             // If no duplicate is found, proceed directly
             await executeSaveComplaints();
@@ -3532,3 +3536,4 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
