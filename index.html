@@ -2395,6 +2395,7 @@ async function sendApprovalLink() {
 }
 
         async function populateNotStartedJobs() {
+			const currentUser = getCurrentUser();
             if (!currentUser) {
                 console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
                 document.getElementById('no-pending-jobs-message').classList.remove('hidden');
@@ -2489,6 +2490,7 @@ async function sendApprovalLink() {
             }
         }
         async function populateCustomerResponseJobs() {
+			const currentUser = getCurrentUser();
             const listContainer = document.getElementById('customer-response-list');
             const noJobsMsg = document.getElementById('no-customer-response-message');
             listContainer.innerHTML = '';
@@ -2547,6 +2549,7 @@ async function sendApprovalLink() {
         }
 
         async function populateAwaitingResponseJobs() {
+			const currentUser = getCurrentUser();
             const listContainer = document.getElementById('awaiting-response-list');
             const noJobsMsg = document.getElementById('no-awaiting-response-message');
             listContainer.innerHTML = '';
@@ -3552,5 +3555,6 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
