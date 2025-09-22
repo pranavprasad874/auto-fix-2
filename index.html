@@ -2872,23 +2872,30 @@ async function sendApprovalLink() {
             document.getElementById('recording-status').textContent = '';
         }
 
-		/**
+/**
  * Finds the customer's voice note in Google Drive and adds a "Play" button to the UI.
  * @param {string} gdriveFolderUrl The full URL of the Google Drive folder for the report.
  * @param {HTMLElement} targetElement The div where the play button should be injected.
  */
 async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
     targetElement.innerHTML = ''; // Clear previous content
-    if (!gdriveFolderUrl || !gapi.client.getToken()) {
-        return; // No folder or not authenticated
+    
+    // IMPROVEMENT: Better check for Google authentication
+    if (!gapi.client.getToken()) {
+        targetElement.innerHTML = '<p class="text-xs text-orange-500">Google Auth needed</p>';
+        return; // Stop if the user is not authenticated with Google
+    }
+
+    if (!gdriveFolderUrl) {
+        return; // No folder to search in, so we leave it blank
     }
 
     try {
         const folderId = gdriveFolderUrl.split('/').pop();
         
-        // Use the Drive API to search for the specific customer voice note file in the folder
+        // THE FIX: Corrected the file name in the search query
         const response = await gapi.client.drive.files.list({
-            q: `'${folderId}' in parents and name contains 'customer_feedback_voice_note'`,
+            q: `'${folderId}' in parents and name contains 'customer_voice_note'`, // Was 'customer_feedback_voice_note'
             fields: 'files(id, name, webViewLink)',
             pageSize: 1
         });
@@ -2897,15 +2904,17 @@ async function findAndDisplayCustomerAudio(gdriveFolderUrl, targetElement) {
             const audioFile = response.result.files[0];
             // Create a button that links directly to the file in Google Drive
             targetElement.innerHTML = `
-                <a href="${audioFile.webViewLink}" target="_blank" class="btn-secondary !w-auto !py-2 !px-4 text-sm flex items-center gap-2">
-                    <span class="material-symbols-outlined">play_circle</span>
-                    Play Customer Voice Note
+                <a href="${audioFile.webViewLink}" target="_blank" class="btn-secondary !w-auto !py-1 !px-2 text-xs flex items-center gap-1">
+                    <span class="material-symbols-outlined !text-base">play_circle</span>
+                    Play Note
                 </a>`;
             targetElement.classList.remove('hidden');
+        } else {
+             targetElement.innerHTML = 'N/A'; // Show N/A if no file was found
         }
     } catch (error) {
         console.error("Error finding customer audio in Google Drive:", error);
-        targetElement.innerHTML = '<p class="text-xs text-red-500">Could not load audio file from Drive.</p>';
+        targetElement.innerHTML = '<p class="text-xs text-red-500">Error loading audio</p>';
     }
 }
 		
@@ -3573,6 +3582,7 @@ async function submitCustomerFeedback() {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
 
 
 
