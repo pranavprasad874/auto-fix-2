@@ -10,20 +10,35 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-	
-<!-- Fallback CSS for older browsers -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+
+<!-- Fallback CSS for older browsers or if JIT fails -->
+<script>
+  (function() {
+    try {
+      // Check if Tailwind JIT applied anything
+      var hasTailwindStyle = document.querySelector("[type='text/tailwindcss']");
+      var bodyColor = getComputedStyle(document.body).color;
+      if (!hasTailwindStyle || bodyColor === "rgb(0, 0, 0)") {
+        var fallback = document.createElement("link");
+        fallback.rel = "stylesheet";
+        fallback.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+        document.head.appendChild(fallback);
+      }
+    } catch (e) {
+      var fallback = document.createElement("link");
+      fallback.rel = "stylesheet";
+      fallback.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
+      document.head.appendChild(fallback);
+    }
+  })();
+</script>
+
+<!-- For users with JS disabled -->
 <noscript>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
 </noscript>
-<script>
-  if (!window.tailwind) {
-    var fallback = document.createElement("link");
-    fallback.rel = "stylesheet";
-    fallback.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-    document.head.appendChild(fallback);
-  }
-</script>
+
 
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -3609,3 +3624,4 @@ function selectReportForUpdate(report) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
