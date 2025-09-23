@@ -10,40 +10,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;700;800&display=swap" rel="stylesheet" />
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
 
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-
-<!-- Fallback CSS for older browsers or if JIT fails -->
-<script>
-  (function() {
-    try {
-      // Check if Tailwind JIT applied anything
-      var hasTailwindStyle = document.querySelector("[type='text/tailwindcss']");
-      var bodyColor = getComputedStyle(document.body).color;
-      if (!hasTailwindStyle || bodyColor === "rgb(0, 0, 0)") {
-        var fallback = document.createElement("link");
-        fallback.rel = "stylesheet";
-        fallback.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-        document.head.appendChild(fallback);
-      }
-    } catch (e) {
-      var fallback = document.createElement("link");
-      fallback.rel = "stylesheet";
-      fallback.href = "https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css";
-      document.head.appendChild(fallback);
-    }
-  })();
-</script>
-
-<!-- For users with JS disabled -->
-<noscript>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css">
-</noscript>
-
-
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+	
+	<style>
+/* Load Material Icons from Google CDN for better compatibility */
+@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
+
+/* Ensure Material Icons render correctly */
+.material-icons {
+  font-family: 'Material Icons';
+  font-weight: normal;
+  font-style: normal;
+  font-size: 24px; /* Adjust size as needed */
+  display: inline-block;
+  line-height: 1;
+  text-transform: none;
+  letter-spacing: normal;
+  word-wrap: normal;
+  white-space: nowrap;
+  direction: ltr;
+  /* Improve rendering across browsers */
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  -moz-osx-font-smoothing: grayscale;
+  font-feature-settings: 'liga';
+}
+
+/* Fallback for older browsers */
+html {
+  font-family: sans-serif; /* Ensure fallback font */
+  -webkit-text-size-adjust: 100%; /* Prevent text scaling issues */
+}
+
+/* Ensure icons are visible even if CSS fails to load properly */
+[class*="material-icons"] {
+  speak: none; /* Prevent screen readers from reading icons */
+  vertical-align: middle;
+}
+</style>
 
     <style type="text/tailwindcss">
         :root {
@@ -1987,6 +1995,7 @@ function addComplaint() {
         }
 
         // This version displays only the complaint text, not the amount.
+// This version displays only the complaint text, not the amount.
 function renderComplaints() {
     const list = document.getElementById('complaints-list');
     list.innerHTML = '';
@@ -2001,7 +2010,7 @@ function renderComplaints() {
         div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg text-sm';
         // Display only the text, not the amount, on the Job Card screen.
         div.innerHTML = `
-            <p class="flex-1 mr-2">${item.text}</p>
+            <p class="flex-1 mr-2 break-all">${item.text}</p>
             <button onclick="deleteComplaint(${index})" class="text-red-500 hover:text-red-700 shrink-0">
                 <span class="material-symbols-outlined">delete</span>
             </button>
@@ -2290,7 +2299,7 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
             complaintItem.className = 'flex items-center justify-between gap-3 p-3 bg-gray-100 rounded-lg';
             complaintItem.innerHTML = `
                 <div class="flex-1">
-                    <span class="font-medium break-all">${item.text}</span>
+                    <span class="font-medium break-words">${item.text}</span>
                 </div>
                 <div class="flex items-center gap-1">
                     <span class="font-bold text-gray-500">₹</span>
@@ -2366,38 +2375,43 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
 
 
 
-       async function saveVehicleUpdate(shouldReset = true) {
-            if(!currentReportId) return showError('No report selected for update.');
+      async function saveVehicleUpdate(shouldReset = true) {
+    if(!currentReportId) return showError('No report selected for update.');
 
-            const deliveryDate = document.getElementById('delivery-date').value;
-            if(!deliveryDate) return showError('Please select an expected delivery date.');
+    const deliveryDate = document.getElementById('delivery-date').value;
+    if(!deliveryDate) return showError('Please select an expected delivery date.');
 
-            const approvedItems = [];
-            document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
-                try {
-                    approvedItems.push(JSON.parse(checkbox.value));
-                } catch(e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
-            });
+    const approvedItems = [];
+    document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
+        try {
+            approvedItems.push(JSON.parse(checkbox.value));
+        } catch(e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
+    });
 
-            const allSuggestions = [...new Set(newSuggestions)];
+    // Combine both original complaints and new suggestions into one complete list.
+    const allItemsForApproval = [
+        ...originalComplaintsForUpdate,
+        ...newSuggestions
+    ];
 
-            // The 'materials_required' line has been removed from this object
-            const updateData = {
-                complaint: JSON.stringify(originalComplaintsForUpdate), // KEY CHANGE: Save updated complaints
-                suggested: JSON.stringify(allSuggestions),
-                approved: JSON.stringify(approvedItems),
-                expected_delivery: deliveryDate,
-                status: 'Ongoing'
-            };
+    // Create the data object to be saved in the database.
+    const updateData = {
+        complaint: JSON.stringify(originalComplaintsForUpdate),
+        // Save the COMBINED list to the 'suggested' column to preserve all items.
+        suggested: JSON.stringify(allItemsForApproval), 
+        approved: JSON.stringify(approvedItems),
+        expected_delivery: deliveryDate,
+        status: 'Ongoing'
+    };
 
-            const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
-            if(error) return showError(`Failed to save update: ${error.message}`);
+    const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
+    if(error) return showError(`Failed to save update: ${error.message}`);
 
-            showSuccessMessage('Update saved successfully!');
-            if (shouldReset) {
-                resetVehicleUpdateScreen();
-            }
-        }
+    showSuccessMessage('Update saved successfully!');
+    if (shouldReset) {
+        resetVehicleUpdateScreen();
+    }
+}
 
                 
         // This new version combines all items and costs before creating the link.
@@ -2525,7 +2539,7 @@ async function sendApprovalLink() {
                             <p class="text-xs font-medium text-gray-500">${createdDate}</p>
                         </div>
                         <p class="text-sm text-gray-600 mt-1">${description}</p>
-                        <p class="text-xs text-gray-500 mt-1 break-all"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
+                        <p class="text-xs text-gray-500 mt-1 break-words"><strong>Complaint:</strong> ${formatArrayCell(report.complaint)}</p>
                     </div>
                     <div class="menu-container">
                         <button class="menu-button p-2 rounded-full hover:bg-gray-100">
@@ -3356,7 +3370,7 @@ function selectReportForUpdate(report) {
                             label.innerHTML = `
                                 <input type="checkbox" value=${checkboxValue} class="h-5 w-5 rounded border-gray-300 text-blue-600 focus:ring-blue-500" onchange="updateCustomerTotal()">
                                 <div class="flex-1 flex justify-between items-center gap-3">
-                                     <span class="text-sm font-medium break-all">${item.text}</span>
+                                     <span class="text-sm font-medium break-words">${item.text}</span>
                                      ${amountDisplay}
                                 </div>
                                 ${tag}
@@ -3624,4 +3638,3 @@ function selectReportForUpdate(report) {
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
-
