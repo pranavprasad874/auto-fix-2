@@ -15,43 +15,6 @@
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-	
-	<style>
-/* Load Material Icons from Google CDN for better compatibility */
-@import url('https://fonts.googleapis.com/icon?family=Material+Icons');
-
-/* Ensure Material Icons render correctly */
-.material-icons {
-  font-family: 'Material Icons';
-  font-weight: normal;
-  font-style: normal;
-  font-size: 24px; /* Adjust size as needed */
-  display: inline-block;
-  line-height: 1;
-  text-transform: none;
-  letter-spacing: normal;
-  word-wrap: normal;
-  white-space: nowrap;
-  direction: ltr;
-  /* Improve rendering across browsers */
-  -webkit-font-smoothing: antialiased;
-  text-rendering: optimizeLegibility;
-  -moz-osx-font-smoothing: grayscale;
-  font-feature-settings: 'liga';
-}
-
-/* Fallback for older browsers */
-html {
-  font-family: sans-serif; /* Ensure fallback font */
-  -webkit-text-size-adjust: 100%; /* Prevent text scaling issues */
-}
-
-/* Ensure icons are visible even if CSS fails to load properly */
-[class*="material-icons"] {
-  speak: none; /* Prevent screen readers from reading icons */
-  vertical-align: middle;
-}
-</style>
 
     <style type="text/tailwindcss">
         :root {
@@ -2375,17 +2338,30 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
 
 
 
-      async function saveVehicleUpdate(shouldReset = true) {
-    if(!currentReportId) return showError('No report selected for update.');
+// REPLACE this entire function
+async function saveVehicleUpdate(shouldReset = true) {
+    if (!currentReportId) return showError('No report selected for update.');
 
     const deliveryDate = document.getElementById('delivery-date').value;
-    if(!deliveryDate) return showError('Please select an expected delivery date.');
+    if (!deliveryDate) return showError('Please select an expected delivery date.');
+
+    // **THE FIX:** Manually validate the selected date to prevent past dates.
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Set to the beginning of today for accurate comparison.
+    const selectedDate = new Date(deliveryDate);
+    // Adjust for timezone differences that can make the selected date appear as the previous day.
+    selectedDate.setMinutes(selectedDate.getMinutes() + selectedDate.getTimezoneOffset());
+
+    if (selectedDate < today) {
+        return showError('The delivery date cannot be in the past. Please select today or a future date.');
+    }
+    // End of fix
 
     const approvedItems = [];
     document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
         try {
             approvedItems.push(JSON.parse(checkbox.value));
-        } catch(e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
+        } catch (e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
     });
 
     // Combine both original complaints and new suggestions into one complete list.
@@ -2398,14 +2374,14 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
     const updateData = {
         complaint: JSON.stringify(originalComplaintsForUpdate),
         // Save the COMBINED list to the 'suggested' column to preserve all items.
-        suggested: JSON.stringify(allItemsForApproval), 
+        suggested: JSON.stringify(allItemsForApproval),
         approved: JSON.stringify(approvedItems),
         expected_delivery: deliveryDate,
         status: 'Ongoing'
     };
 
     const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
-    if(error) return showError(`Failed to save update: ${error.message}`);
+    if (error) return showError(`Failed to save update: ${error.message}`);
 
     showSuccessMessage('Update saved successfully!');
     if (shouldReset) {
@@ -2413,12 +2389,9 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
     }
 }
 
+
                 
-        // This new version combines all items and costs before creating the link.
-// This new version opens a window immediately to prevent pop-up blockers
-// and fetches the client's phone number more reliably.
-// This is a more robust version that ensures all data is saved and verified
-// BEFORE attempting to open the WhatsApp link in a single, direct action.
+// REPLACE this entire function
 async function sendApprovalLink() {
     if (!currentReportId) {
         return showError('No report is currently selected.');
@@ -2469,8 +2442,8 @@ async function sendApprovalLink() {
         const encodedText = encodeURIComponent(messageText);
         const whatsappUrl = `https://wa.me/91${clientPhone}?text=${encodedText}`;
 
-        // 6. Only after all checks pass, open the link directly.
-        window.open(whatsappUrl, '_blank');
+        // 6. **THE FIX:** Use window.location.href for better mobile compatibility.
+        window.location.href = whatsappUrl;
 
         showSuccessMessage("Approval link sent! Job moved to 'Awaiting Response'.");
         resetVehicleUpdateScreen();
@@ -2481,6 +2454,8 @@ async function sendApprovalLink() {
         showError(`An error occurred: ${error.message}`);
     }
 }
+
+
         async function populateNotStartedJobs() {
             if (!currentUser) {
                 console.error("populateNotStartedJobs: currentUser is null. Cannot fetch data.");
