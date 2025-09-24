@@ -2219,6 +2219,10 @@ async function createVehicle() {
                 if (!newVehicle.model_id || !newVehicle.fuel_type || !newVehicle.odometer || !newVehicle.client_name || !newVehicle.engine_no || !newVehicle.chassis_no) {
                     return showError('Please fill all mandatory vehicle details.');
                 }
+            } else {
+                // THIS IS THE FIX: Provide a default value for the required odometer field
+                // when using the simplified form.
+                newVehicle.odometer = 0;
             }
 
             if (!/^\d{10}$/.test(newVehicle.client_phone)) {
@@ -2226,7 +2230,10 @@ async function createVehicle() {
             }
 
             const { data, error } = await sb.from('vehicles').insert(newVehicle).select().single();
-            if (error) return showError(`Failed to create vehicle: ${error.message}`);
+            if (error) {
+                // Pass the actual error object for better console logging
+                return showError(`Failed to create vehicle: ${error.message}`, error);
+            }
             
             currentVehicleId = data.id;
             document.getElementById('create-vehicle-form').reset();
@@ -4152,3 +4159,4 @@ document.addEventListener('DOMContentLoaded', async () => { // Make this async
     <script async defer src="https://accounts.google.com/gsi/client" onload="gisLoaded()"></script>
 </body>
 </html>
+
