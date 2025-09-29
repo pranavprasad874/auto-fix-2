@@ -1948,8 +1948,10 @@ async function populateReadyToCloseJobs() {
     reports.forEach(report => {
         const card = document.createElement('div');
         const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
-        // THE FIX: The main container and button group now stack on mobile
+        
+        // This class stacks the card's content vertically on mobile (flex-col)
         card.className = 'p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
+        
         card.innerHTML = `
             <div class="w-full text-left">
                 <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
@@ -2257,8 +2259,10 @@ async function populateWashPendingJobs() {
     reports.forEach(report => {
         const card = document.createElement('div');
         const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
-        // THE FIX: The main container and button group now stack on mobile
+        
+        // This class stacks the card's content vertically on mobile (flex-col)
         card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
+
         card.innerHTML = `
             <div class="w-full text-left">
                 <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
