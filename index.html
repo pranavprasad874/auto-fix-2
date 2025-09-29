@@ -672,21 +672,19 @@
             <main class="app-main">
                 <div class="card">
                     <h2 class="text-xl font-bold mb-4">Filter Reports</h2>
-                    <div id="report-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4 items-end">
-                        <div class="space-y-1">
-                            <label for="filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
-                            <input type="date" id="filter-from-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
-                        </div>
-                        <div class="space-y-1">
-                            <label for="filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
-                            <input type="date" id="filter-to-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
-                        </div>
-                       
-                        <input type="text" id="filter-vehicle-no" class="form-input" placeholder="Vehicle Number" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); applyReportFilters()">
-                        <input type="text" id="filter-brand" class="form-input" placeholder="Brand" oninput="applyReportFilters()">
-                        <input type="text" id="filter-exec-name" class="form-input" placeholder="Executive Name" oninput="applyReportFilters()">
-                        <button onclick="clearReportFilters()" class="text-sm h-11 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">Clear Filters</button>
-                    </div>
+<div id="report-filters" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4 items-end">
+    <div class="space-y-1">
+        <label for="filter-from-date" class="text-xs font-medium text-gray-500">From Date</label>
+        <input type="date" id="filter-from-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
+    </div>
+    <div class="space-y-1">
+        <label for="filter-to-date" class="text-xs font-medium text-gray-500">To Date</label>
+        <input type="date" id="filter-to-date" class="form-input" onchange="handleDateChange('filter-from-date', 'filter-to-date'); applyReportFilters();">
+    </div>
+    <input type="text" id="filter-vehicle-no" class="form-input" placeholder="Vehicle Number" oninput="this.value = this.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); applyReportFilters()">
+    <input type="text" id="filter-brand" class="form-input" placeholder="Brand" oninput="applyReportFilters()">
+    <button onclick="clearReportFilters()" class="text-sm h-11 text-gray-600 bg-gray-200 rounded-lg hover:bg-gray-300">Clear Filters</button>
+</div>
                 </div>
                 <div class="card">
                     <div class="flex justify-between items-center mb-4">
@@ -2425,8 +2423,8 @@ async function addUser(role) {
 
         // --- ADMIN & EXECUTIVE: REPORTS ---
 
-        //
-// THIS IS THE COMPLETE, CORRECTED FUNCTION. REPLACE YOUR OLD ONE WITH THIS.
+//
+// THIS IS THE FINAL, MORE ROBUST FUNCTION. PLEASE REPLACE THE OLD ONE WITH THIS.
 //
 async function fetchAndPopulateReports(isAdmin = false) {
     const tableContainerId = isAdmin ? 'admin-reports-screen' : 'report-screen';
@@ -2434,7 +2432,6 @@ async function fetchAndPopulateReports(isAdmin = false) {
     const tableEl = document.querySelector(`#${tableContainerId} .report-table`);
     const tableBody = document.getElementById(tableBodyId);
     const noReportsMsg = document.getElementById(isAdmin ? 'admin-no-reports-message' : 'no-reports-message');
-
     // --- Define all possible columns and their render logic ---
     const allColumns = [
         { key: 'vehicle_no', label: 'Vehicle No.', render: (row) => `<button onclick='printJobCardById(${row.id})' class="text-gray-500 hover:text-green-600 p-1 rounded-full shrink-0"><span class="material-symbols-outlined">download</span></button><span>${row.vehicles.vehicle_no}</span>`, className: 'flex items-center gap-x-2' },
@@ -2459,10 +2456,8 @@ async function fetchAndPopulateReports(isAdmin = false) {
         { key: 'marks', label: 'Marks', render: (row) => (row.marks && row.marks.length > 2) ? `<button onclick='openMarksModal(${JSON.stringify(row.marks)})' class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs">View</button>` : 'N/A' },
         { key: 'media', label: 'Media', render: (row) => row.gdrive_folder_url ? `<a href="${row.gdrive_folder_url}" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs font-semibold">View Files</a>` : '<span class="text-xs text-gray-500">Not Uploaded</span>' }
     ];
-
     const visibleColumnKeys = appSettings.visible_report_columns || allColumns.map(c => c.key);
     const columnsToRender = allColumns.filter(c => visibleColumnKeys.includes(c.key));
-
     // --- Dynamically build the table header ---
     let thead = tableEl.querySelector('thead');
     if (!thead) {
@@ -2470,14 +2465,33 @@ async function fetchAndPopulateReports(isAdmin = false) {
         tableEl.prepend(thead);
     }
     thead.innerHTML = `<tr>${columnsToRender.map(col => `<th>${col.label}</th>`).join('')}</tr>`;
-
     // --- Get Filter Values ---
     const fromDate = document.getElementById(isAdmin ? 'admin-filter-from-date' : 'filter-from-date').value;
     const toDate = document.getElementById(isAdmin ? 'admin-filter-to-date' : 'filter-to-date').value;
     const vehicleNo = document.getElementById(isAdmin ? 'admin-filter-vehicle-no' : 'filter-vehicle-no').value.trim().toUpperCase();
     const brand = document.getElementById(isAdmin ? 'admin-filter-brand' : 'filter-brand').value.trim();
-    const execName = document.getElementById(isAdmin ? 'admin-filter-exec-name' : 'filter-exec-name').value.trim();
-
+    const execName = isAdmin ? document.getElementById('admin-filter-exec-name').value.trim() : '';
+    // --- NEW: More Robust Executive Filter Logic ---
+    let executiveIdsToFilter = [];
+    if (isAdmin && execName) {
+        // Step 1: Find the IDs of executives matching the name.
+        const { data: users, error: userError } = await sb
+            .from('users')
+            .select('id')
+            .ilike('username', `%${execName}%`);
+        if (userError) {
+            showError("Could not search for executives.", userError);
+            return;
+        }
+        if (users.length === 0) {
+            // If no executives match the name, show an empty table immediately.
+            tableBody.innerHTML = '';
+            noReportsMsg.classList.remove('hidden');
+            return;
+        }
+        executiveIdsToFilter = users.map(user => user.id);
+    }
+    // --- End of New Logic ---
     // --- Build The Query ---
     let query = sb.from('reports').select(`
         id, created_at, status, complaint, suggested, approved, marks,
@@ -2490,9 +2504,14 @@ async function fetchAndPopulateReports(isAdmin = false) {
         executive:executive_id(username, id),
         inspector:inspector_id(username, id)
     `).order('created_at', { ascending: false });
-
     // --- Apply Filters To The Query ---
-    if (!isAdmin) {
+    if (isAdmin) {
+        // Step 2: Use the IDs we found to filter the main reports query.
+        if (executiveIdsToFilter.length > 0) {
+            query = query.in('executive_id', executiveIdsToFilter);
+        }
+    } else {
+        // For executives, STRICTLY filter by their own ID.
         query = query.eq('executive_id', currentUser.id);
     }
     if (fromDate) {
@@ -2501,24 +2520,16 @@ async function fetchAndPopulateReports(isAdmin = false) {
     if (toDate) {
         query = query.lte('created_at', `${toDate}T23:59:59`);
     }
-    // -- THIS IS THE NEWLY ADDED, WORKING FILTER LOGIC --
     if (vehicleNo) {
         query = query.ilike('vehicles.vehicle_no', `%${vehicleNo}%`);
     }
     if (brand) {
         query = query.ilike('vehicles.vehicle_models.brand', `%${brand}%`);
     }
-    if (execName) {
-        query = query.ilike('executive.username', `%${execName}%`);
-    }
-    // -- END OF NEW LOGIC --
-    
     const reports = await handleSupabaseQuery(query, "Failed to fetch reports.");
     if (reports === null) return;
-    
     reportsDataStore = {};
     reports.forEach(row => { reportsDataStore[row.id] = row; });
-    
     // --- Dynamically build the table body ---
     tableBody.innerHTML = '';
     if (reports.length === 0) {
@@ -2526,7 +2537,6 @@ async function fetchAndPopulateReports(isAdmin = false) {
         return;
     }
     noReportsMsg.classList.add('hidden');
-    
     reports.forEach(row => {
         const tr = document.createElement('tr');
         columnsToRender.forEach(col => {
