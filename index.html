@@ -399,7 +399,7 @@
             </button>
         </div>
         <p class="text-gray-600">Select user type to access their interface:</p>
-        <div id="quick-access-users" class="space-y-3">
+        <div id="quick-access-users" class="space-y-3 max-h-[60vh] overflow-y-auto pr-2">
             <!-- Will be populated by JavaScript -->
         </div>
         <div class="flex justify-end gap-3 pt-4 border-t">
@@ -1920,15 +1920,15 @@ function showCloseTab(tabName) {
 }
 
 // Add this new function to power the "Ready to Close" tab
+// REPLACE this function
 async function populateReadyToCloseJobs() {
     if (!currentUser) return;
     const listContainer = document.getElementById('ready-to-close-list');
     const noJobsMsg = document.getElementById('no-ready-to-close-message');
     
-    // Defensive check
     if (!listContainer || !noJobsMsg) return console.error("Ready to close elements not found.");
 
-    listContainer.innerHTML = ''; // Safely clear only the list
+    listContainer.innerHTML = '';
     noJobsMsg.classList.add('hidden');
 
     const { data: reports, error } = await sb.from('reports')
@@ -1948,21 +1948,20 @@ async function populateReadyToCloseJobs() {
     reports.forEach(report => {
         const card = document.createElement('div');
         const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
-        card.className = 'p-4 border border-gray-200 rounded-lg';
+        // THE FIX: The main container and button group now stack on mobile
+        card.className = 'p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
         card.innerHTML = `
-            <div class="flex justify-between items-center">
-                <div>
-                    <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
-                    <p class="text-sm text-gray-600">${brandAndModel}</p>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button onclick="updateJobStatus(${report.id}, 'pending_inspection', '${report.vehicles.vehicle_no}')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1.5 px-3 rounded text-sm">
-                        Send for Inspection
-                    </button>
-                    <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm">
-                        Skip & Wash
-                    </button>
-                </div>
+            <div class="w-full text-left">
+                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                <p class="text-sm text-gray-600">${brandAndModel}</p>
+            </div>
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                <button onclick="updateJobStatus(${report.id}, 'pending_inspection', '${report.vehicles.vehicle_no}')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
+                    Send for Inspection
+                </button>
+                <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
+                    Skip & Wash
+                </button>
             </div>
         `;
         listContainer.appendChild(card);
@@ -2232,6 +2231,7 @@ async function confirmInspection(reportId, outcome) {
 
 
 // Replace your existing populateWashPendingJobs function with this one
+// REPLACE this function
 async function populateWashPendingJobs() {
     if (!currentUser) return;
     const listContainer = document.getElementById('wash-pending-list');
@@ -2239,7 +2239,7 @@ async function populateWashPendingJobs() {
     
     if (!listContainer || !noJobsMsg) return console.error("Wash pending elements not found.");
 
-    listContainer.innerHTML = ''; // Safely clear only the list
+    listContainer.innerHTML = '';
     noJobsMsg.classList.add('hidden');
 
     const { data: reports, error } = await sb.from('reports')
@@ -2257,17 +2257,18 @@ async function populateWashPendingJobs() {
     reports.forEach(report => {
         const card = document.createElement('div');
         const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
-        card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg';
+        // THE FIX: The main container and button group now stack on mobile
+        card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
         card.innerHTML = `
-            <div class="flex-grow">
+            <div class="w-full text-left">
                 <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
                 <p class="text-sm text-gray-600">${brandAndModel}</p>
             </div>
-            <div class="flex items-center gap-2 flex-shrink-0">
-                <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm">
+            <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
                     Send for Wash
                 </button>
-                <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded text-sm">
+                <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
                     Skip & Complete
                 </button>
             </div>
@@ -3395,14 +3396,16 @@ async function showQuickAccessModal() {
     await populateQuickAccessUsers();
 }
 
+// REPLACE this function
 async function populateQuickAccessUsers() {
     const container = document.getElementById('quick-access-users');
     container.innerHTML = '<p class="text-center text-gray-500">Loading users...</p>';
 
+    // THE FIX: Added 'inspector' to the list of roles to fetch
     const { data: users, error } = await sb
         .from('users')
         .select('id, username, role, team')
-        .in('role', ['executive', 'washer'])
+        .in('role', ['executive', 'washer', 'inspector'])
         .order('role', { ascending: true })
         .order('username', { ascending: true });
 
@@ -3414,43 +3417,49 @@ async function populateQuickAccessUsers() {
     container.innerHTML = '';
 
     if (users.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-500">No executives or washers found</p>';
+        container.innerHTML = '<p class="text-center text-gray-500">No executives, washers, or inspectors found</p>';
         return;
     }
 
     const executives = users.filter(u => u.role === 'executive');
     const washers = users.filter(u => u.role === 'washer');
+    const inspectors = users.filter(u => u.role === 'inspector'); // Added this line
 
     if (executives.length > 0) {
+        // Unchanged...
         const execSection = document.createElement('div');
         execSection.innerHTML = '<h4 class="font-bold text-gray-700 mb-2">Executives</h4>';
         executives.forEach(user => {
             const userBtn = document.createElement('button');
             userBtn.className = 'w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-3';
-
-            // Create a separate, styled span for the team name
-            let teamHtml = '';
-            if (user.team) {
-                teamHtml = `<span class="text-sm font-normal text-gray-600 ml-1">(${user.team})</span>`;
-            }
-
+            let teamHtml = user.team ? `<span class="text-sm font-normal text-gray-600 ml-1">(${user.team})</span>` : '';
             userBtn.innerHTML = `
                 <span class="material-symbols-outlined text-blue-600">person</span>
-                <div>
-                    <p class="font-semibold text-gray-800">
-                        ${user.username}
-                        ${teamHtml}
-                    </p>
-                    <p class="text-xs text-gray-500 capitalize">${user.role}</p>
-                </div>
-            `;
+                <div><p class="font-semibold text-gray-800">${user.username} ${teamHtml}</p><p class="text-xs text-gray-500 capitalize">${user.role}</p></div>`;
             userBtn.onclick = () => quickAccessUser(user);
             execSection.appendChild(userBtn);
         });
         container.appendChild(execSection);
     }
 
+    // THE FIX: Added this entire block to display inspectors
+    if (inspectors.length > 0) {
+        const inspectorSection = document.createElement('div');
+        inspectorSection.innerHTML = '<h4 class="font-bold text-gray-700 mb-2 mt-4">Inspectors</h4>';
+        inspectors.forEach(user => {
+            const userBtn = document.createElement('button');
+            userBtn.className = 'w-full text-left p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg transition-colors flex items-center gap-3';
+            userBtn.innerHTML = `
+                <span class="material-symbols-outlined text-yellow-600">fact_check</span>
+                <div><p class="font-semibold text-gray-800">${user.username}</p><p class="text-xs text-gray-500 capitalize">${user.role}</p></div>`;
+            userBtn.onclick = () => quickAccessUser(user);
+            inspectorSection.appendChild(userBtn);
+        });
+        container.appendChild(inspectorSection);
+    }
+
     if (washers.length > 0) {
+        // Unchanged...
         const washerSection = document.createElement('div');
         washerSection.innerHTML = '<h4 class="font-bold text-gray-700 mb-2 mt-4">Washers</h4>';
         washers.forEach(user => {
@@ -3458,11 +3467,7 @@ async function populateQuickAccessUsers() {
             userBtn.className = 'w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-3';
             userBtn.innerHTML = `
                 <span class="material-symbols-outlined text-green-600">local_car_wash</span>
-                <div>
-                    <p class="font-semibold text-gray-800">${user.username}</p>
-                    <p class="text-xs text-gray-500 capitalize">${user.role}</p>
-                </div>
-            `;
+                <div><p class="font-semibold text-gray-800">${user.username}</p><p class="text-xs text-gray-500 capitalize">${user.role}</p></div>`;
             userBtn.onclick = () => quickAccessUser(user);
             washerSection.appendChild(userBtn);
         });
@@ -3470,6 +3475,7 @@ async function populateQuickAccessUsers() {
     }
 }
 
+// REPLACE this function
 async function quickAccessUser(user) {
     sessionStorage.setItem('originalAdmin', JSON.stringify(currentUser));
     currentUser = user;
@@ -3486,8 +3492,14 @@ async function quickAccessUser(user) {
         showScreen('washer-screen');
         populateWashList();
         showSuccessMessage(`Switched to washer: ${user.username}`);
+    } else if (user.role === 'inspector') { // THE FIX: Added this block
+        showScreen('inspector-screen');
+        populateInspectionQueue();
+        showSuccessMessage(`Switched to inspector: ${user.username}`);
     }
 }
+
+
         // ADD THIS NEW FUNCTION
         async function updateReportColumns() {
             const checklist = document.getElementById('report-columns-checklist');
