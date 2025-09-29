@@ -200,11 +200,21 @@
                     <h2 class="text-lg font-bold mt-2">App Settings</h2>
                     <p class="text-sm text-[var(--text-secondary)]">Toggle features and form fields</p>
                 </a>
+<a href="javascript:void(0)" onclick="showAdminScreen('admin-inspector-management-screen')" class="card text-center items-center flex flex-col justify-center transition-all hover:shadow-xl hover:-translate-y-1">
+    <span class="material-symbols-outlined text-5xl text-[var(--primary-color)]">fact_check</span>
+    <h2 class="text-lg font-bold mt-2">Inspector Management</h2>
+    <p class="text-sm text-[var(--text-secondary)]">Create & Delete Inspectors</p>
+</a>
 				<a href="javascript:void(0)" onclick="showAdminScreen('admin-washer-management-screen')" class="card text-center items-center flex flex-col justify-center transition-all hover:shadow-xl hover:-translate-y-1">
                     <span class="material-symbols-outlined text-5xl text-[var(--primary-color)]">local_car_wash</span>
                     <h2 class="text-lg font-bold mt-2">Washer Management</h2>
                     <p class="text-sm text-[var(--text-secondary)]">Create & Delete Washers</p>
                 </a>
+				<a href="javascript:void(0)" onclick="showQuickAccessModal()" class="card text-center items-center flex flex-col justify-center transition-all hover:shadow-xl hover:-translate-y-1">
+    <span class="material-symbols-outlined text-5xl text-[var(--primary-color)]">switch_account</span>
+    <h2 class="text-lg font-bold mt-2">Quick Access</h2>
+    <p class="text-sm text-[var(--text-secondary)]">Switch to Executive/Washer View</p>
+</a>
             </main>
         </div>
         
@@ -271,19 +281,26 @@
             <header class="app-header"><div class="app-header-content"><button class="absolute left-4 text-[var(--text-secondary)] hover:text-[var(--primary-color)]" onclick="showAdminScreen('admin-dashboard-screen')"><span class="material-symbols-outlined">arrow_back_ios_new</span></button><h1 class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Executive Management</h1></div></header>
             <main class="app-main">
                 <div class="card"><h2 class="text-xl font-bold mb-4">Create New Executive</h2>
-				<form id="add-exec-form" onsubmit="event.preventDefault(); addUser('executive');" class="space-y-4">
-                        <div><label for="new-exec-username" class="form-label">Username <span class="text-red-500">*</span></label><input id="new-exec-username" class="form-input" placeholder="Enter Username" required /></div>
-                        <div><label for="new-exec-pass" class="form-label">Password <span class="text-red-500">*</span></label><input id="new-exec-pass" class="form-input" placeholder="Enter Password" type="password" required /></div>
-                        <div>
-                            <label for="new-exec-team" class="form-label">Team <span class="text-red-500">*</span></label>
-                            <select id="new-exec-team" class="form-input" required>
-                                <option value="">Select Team</option>
-                                <option value="Accident">Accident</option>
-                                <option value="Service">Service</option>
-                            </select>
-                        </div>
-                        <button type="submit" class="btn-primary"><span class="material-symbols-outlined">add</span>Create Executive</button>
-                    </form>
+				<form id="add-executive-form" onsubmit="event.preventDefault(); addUser('executive');" class="space-y-4">
+    <div>
+        <label for="new-executive-username" class="form-label">Username <span class="text-red-500">*</span></label>
+        <input id="new-executive-username" class="form-input" placeholder="Enter Username" required />
+    </div>
+    <div>
+        <label for="new-executive-pass" class="form-label">Password <span class="text-red-500">*</span></label>
+        <input id="new-executive-pass" class="form-input" placeholder="Enter Password" type="password" required />
+    </div>
+    <div>
+        <label for="new-exec-team" class="form-label">Team <span class="text-red-500">*</span></label>
+        <select id="new-exec-team" class="form-input" required>
+            <option value="">Select Team</option>
+            <option value="Accident">Accident</option>
+            <option value="Service">Service</option>
+            <option value="Insurance">Insurance</option>
+        </select>
+    </div>
+    <button type="submit" class="btn-primary"><span class="material-symbols-outlined">add</span>Create Executive</button>
+</form>
 				</div>
                 <div class="card space-y-3"><h2 class="text-xl font-bold">Executive List</h2><div id="executives-list"></div></div>
             </main>
@@ -344,19 +361,60 @@
                 </div>
             </main>
         </div>
+		
+<div id="admin-inspector-management-screen" class="admin-screen" style="display: none;">
+    <header class="app-header">
+        <div class="app-header-content">
+            <button class="absolute left-4 text-[var(--text-secondary)] hover:text-[var(--primary-color)]" onclick="showAdminScreen('admin-dashboard-screen')">
+                <span class="material-symbols-outlined">arrow_back_ios_new</span>
+            </button>
+            <h1 class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Inspector Management</h1>
+        </div>
+    </header>
+    <main class="app-main">
+        <div class="card">
+            <h2 class="text-xl font-bold mb-4">Create New Inspector</h2>
+            <form id="add-inspector-form" onsubmit="event.preventDefault(); addUser('inspector');" class="space-y-4">
+                <div><label for="new-inspector-username" class="form-label">Username <span class="text-red-500">*</span></label><input id="new-inspector-username" class="form-input" placeholder="Enter Username" required /></div>
+                <div><label for="new-inspector-pass" class="form-label">Password <span class="text-red-500">*</span></label><input id="new-inspector-pass" class="form-input" placeholder="Enter Password" type="password" required /></div>
+                <button type="submit" class="btn-primary"><span class="material-symbols-outlined">add</span>Create Inspector</button>
+            </form>
+        </div>
+        <div class="card space-y-3">
+            <h2 class="text-xl font-bold">Inspector List</h2>
+            <div id="inspectors-list"></div>
+        </div>
+    </main>
+</div>
+
         </div>
     </div>
-
+<div id="quick-access-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="hideModal('quick-access-modal')"></div>
+    <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
+        <div class="flex justify-between items-center">
+            <h3 class="text-xl font-bold text-gray-800">Quick Access</h3>
+            <button onclick="hideModal('quick-access-modal')" class="text-gray-500 hover:text-gray-700">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        <p class="text-gray-600">Select user type to access their interface:</p>
+        <div id="quick-access-users" class="space-y-3">
+            <!-- Will be populated by JavaScript -->
+        </div>
+        <div class="flex justify-end gap-3 pt-4 border-t">
+            <button onclick="hideModal('quick-access-modal')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">
+                Cancel
+            </button>
+        </div>
+    </div>
+</div>
     <div id="executive-screens" class="screen">
-        <header class="app-header">
-            <div class="app-header-content">
-                <h1 id="executive-header-title" class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Job Card</h1>
-                <button onclick="logout()" class="absolute right-4 flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)]">
-                    <span class="font-medium text-sm hidden sm:block">Logout</span>
-                    <span class="material-symbols-outlined">logout</span>
-                </button>
-            </div>
-        </header>
+       <header class="app-header">
+    <div class="app-header-content">
+        <h1 id="executive-header-title" class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Job Card</h1>
+    </div>
+</header>
 
         <div id="job-card-screen" class="executive-screen active-executive-screen">
              <main class="app-main">
@@ -500,29 +558,29 @@
             </main>
         </div>
 
-        <div id="vehicle-update-screen" class="executive-screen" style="display: none;">
-			<main class="app-main">
-                <div id="update-tab-container" class="card !p-0">
-                    <div class="flex border-b border-gray-200 px-5">
-                        <button id="tab-btn-pending" class="tab-button active-tab" onclick="showUpdateTab('pending')">Pending Jobs</button>
-                        <button id="tab-btn-awaiting" class="tab-button" onclick="showUpdateTab('awaiting')">Awaiting Response</button>
-                        <button id="tab-btn-responses" class="tab-button" onclick="showUpdateTab('responses')">Responses Received</button>
-                    </div>
-                    <div class="p-5">
-                        <div id="pending-jobs-panel" class="tab-panel">
-                            <div id="not-started-jobs-list" class="space-y-3"></div>
-                            <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No pending job cards found.</p>
-                        </div>
-                        <div id="awaiting-response-panel" class="tab-panel hidden">
-                            <div id="awaiting-response-list" class="space-y-3"></div>
-                            <p id="no-awaiting-response-message" class="text-center text-gray-500 py-8 hidden">No jobs are currently awaiting a customer response.</p>
-                        </div>
-                        <div id="responses-received-panel" class="tab-panel hidden">
-                            <div id="customer-response-list" class="space-y-3"></div>
-                            <p id="no-customer-response-message" class="text-center text-gray-500 py-8 hidden">No new customer responses found.</p>
-                        </div>
-                    </div>
+<div id="vehicle-update-screen" class="executive-screen" style="display: none;">
+    <main class="app-main">
+        <div id="update-tab-container">
+            <div class="flex border-b border-gray-200 px-5">
+                <button id="tab-btn-pending" class="tab-button active-tab" onclick="showUpdateTab('pending')">Pending Jobs</button>
+                <button id="tab-btn-awaiting" class="tab-button" onclick="showUpdateTab('awaiting')">Awaiting Response</button>
+                <button id="tab-btn-responses" class="tab-button" onclick="showUpdateTab('responses')">Responses Received</button>
+            </div>
+            <div class="p-5">
+                <div id="pending-jobs-panel" class="tab-panel">
+                    <div id="not-started-jobs-list" class="space-y-3"></div>
+                    <p id="no-pending-jobs-message" class="text-center text-gray-500 py-8 hidden">No jobs are currently pending.</p>
                 </div>
+                <div id="awaiting-response-panel" class="tab-panel hidden">
+                    <div id="awaiting-response-list" class="space-y-3"></div>
+                    <p id="no-awaiting-response-message" class="text-center text-gray-500 py-8 hidden">No jobs are awaiting customer response.</p>
+                </div>
+                <div id="responses-received-panel" class="tab-panel hidden">
+                    <div id="customer-response-list" class="space-y-3"></div>
+                    <p id="no-customer-response-message" class="text-center text-gray-500 py-8 hidden">No responses received from customers yet.</p>
+                </div>
+            </div>
+        </div>
 
                 <div id="update-details-section" class="card hidden space-y-4">
                     <h2 class="text-xl font-bold flex items-center gap-2 text-green-600"><span class="material-symbols-outlined">check_circle</span> Selected Report</h2>
@@ -649,23 +707,54 @@
             </main>
         </div>
 <div id="due-date-screen" class="executive-screen" style="display: none;">
-            <main class="app-main">
-                <div class="card !p-0">
-                    <div class="flex border-b border-gray-200 px-5">
-                        <button id="tab-btn-wash-pending" class="tab-button active-tab" onclick="showCloseTab('wash-pending')">Wash Pending</button>
-                        <button id="tab-btn-complete" class="tab-button" onclick="showCloseTab('complete')">Complete</button>
-                    </div>
-                    <div class="p-5">
-                        <div id="wash-pending-panel" class="tab-panel space-y-3">
-                            <p id="no-wash-pending-message" class="text-center text-gray-500 py-8 hidden">No jobs are pending for wash.</p>
-                        </div>
-                        <div id="complete-panel" class="tab-panel hidden space-y-3">
-                            <p id="no-complete-message" class="text-center text-gray-500 py-8 hidden">No jobs are ready for completion.</p>
-                        </div>
-                    </div>
-                </div>
-            </main>
+    <main class="app-main">
+        <div class="card !p-0">
+            <div class="flex border-b border-gray-200 px-5">
+                <button id="tab-btn-ready-to-close" class="tab-button active-tab" onclick="showCloseTab('ready-to-close')">
+                    Ready to Close
+                </button>
+                <button id="tab-btn-inspection-pending" class="tab-button" onclick="showCloseTab('inspection-pending')">
+                    Inspection Pending
+                </button>
+                <button id="tab-btn-wash-pending" class="tab-button" onclick="showCloseTab('wash-pending')">
+                    Wash Pending
+                </button>
+                <button id="tab-btn-complete" class="tab-button" onclick="showCloseTab('complete')">
+                    Complete
+                </button>
+            </div>
+            <div class="p-5">
+<div id="ready-to-close-panel" class="tab-panel">
+    <div id="ready-to-close-list" class="space-y-3"></div>
+    <p id="no-ready-to-close-message" class="text-center text-gray-500 py-8 hidden">No jobs are ready for the next step.</p>
+</div>
+
+<div id="inspection-pending-panel" class="tab-panel hidden space-y-6">
+    <div id="rejected-jobs-section">
+        <h3 class="text-lg font-bold text-red-700 mb-2">Rejected by Inspector</h3>
+        <div id="rejected-jobs-list" class="space-y-3"></div>
+        <p id="no-rejected-jobs-message" class="text-center text-gray-500 py-4 hidden">No jobs have been rejected.</p>
+    </div>
+    <div id="pending-inspection-section" class="border-t pt-4">
+        <h3 class="text-lg font-bold text-gray-700 mb-2">Pending Inspection</h3>
+        <div id="pending-inspection-list" class="space-y-3"></div>
+        <p id="no-inspection-pending-message" class="text-center text-gray-500 py-4 hidden">No jobs are currently pending for inspection.</p>
+    </div>
+</div>
+
+<div id="wash-pending-panel" class="tab-panel hidden">
+    <div id="wash-pending-list" class="space-y-3"></div>
+    <p id="no-wash-pending-message" class="text-center text-gray-500 py-8 hidden">No jobs are pending for wash.</p>
+</div>
+
+<div id="complete-panel" class="tab-panel hidden">
+    <div id="complete-list" class="space-y-3"></div>
+    <p id="no-complete-message" class="text-center text-gray-500 py-8 hidden">No jobs are ready for completion.</p>
+</div>
+            </div>
         </div>
+    </main>
+</div>
         <div id="profile-screen" class="executive-screen" style="display: none;">
             <main class="app-main">
                 <div class="card">
@@ -713,22 +802,90 @@
             </div>
         </footer>
     </div>
-</div> <div id="washer-screen" class="screen">
-        <header class="app-header">
-            <div class="app-header-content">
-                <h1 class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Wash Queue</h1>
-                <button onclick="logout()" class="absolute right-4 flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)]">
-                    <span class="font-medium text-sm hidden sm:block">Logout</span>
-                    <span class="material-symbols-outlined">logout</span>
-                </button>
+</div> 
+<div id="washer-screen" class="screen">
+    <header class="app-header">
+        <div class="app-header-content">
+            <h1 class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Wash Queue</h1>
+            <button onclick="logout()" class="absolute right-4 flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)]">
+                <span class="font-medium text-sm hidden sm:block">Logout</span>
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </div>
+    </header>
+    <main class="app-main">
+        <div id="wash-queue-list" class="space-y-3">
             </div>
-        </header>
-        <main class="app-main">
-            <div id="wash-queue-list" class="space-y-3">
-                </div>
-            <p id="no-wash-jobs-message" class="text-center text-gray-500 py-8 hidden">No vehicles are currently in the wash queue.</p>
-        </main>
+        <p id="no-wash-jobs-message" class="text-center text-gray-500 py-8 hidden">No vehicles are currently in the wash queue.</p>
+    </main>
+</div>
+<div id="inspector-screen" class="screen">
+    <header class="app-header">
+        <div class="app-header-content">
+            <h1 class="text-2xl font-bold text-[var(--primary-color)] flex-1 text-center">Inspection Queue</h1>
+            <button onclick="logout()" class="absolute right-4 flex items-center gap-2 text-[var(--text-secondary)] hover:text-[var(--primary-color)]">
+                <span class="font-medium text-sm hidden sm:block">Logout</span>
+                <span class="material-symbols-outlined">logout</span>
+            </button>
+        </div>
+    </header>
+    <main class="app-main">
+        <div id="inspection-queue-list" class="space-y-3">
+            </div>
+        <p id="no-inspection-jobs-message" class="text-center text-gray-500 py-8 hidden">No vehicles are currently in the inspection queue.</p>
+    </main>
+</div>
+
+<div id="inspection-remarks-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm"></div>
+    <div class="relative bg-white rounded-lg p-6 w-full max-w-md m-4 space-y-4">
+        <h3 id="remarks-modal-title" class="text-xl font-bold text-gray-800">Inspection Remarks</h3>
+        <p id="remarks-modal-text" class="text-gray-600"></p>
+        <div>
+            <label for="inspection-remarks-input" class="form-label">Remarks (Required):</label>
+            <textarea id="inspection-remarks-input" class="form-input" rows="3" placeholder="Enter remarks..."></textarea>
+        </div>
+        <div class="flex justify-end gap-4 pt-4">
+            <button onclick="hideModal('inspection-remarks-modal')" class="px-4 py-2 rounded-lg bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold">Cancel</button>
+            <button id="confirm-inspection-button" class="px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold">Confirm</button>
+        </div>
     </div>
+</div>
+<div id="inspector-details-modal" class="fixed inset-0 z-50 flex items-center justify-center modal-hidden">
+    <div class="fixed inset-0 bg-black/60 backdrop-blur-sm" onclick="hideModal('inspector-details-modal')"></div>
+    <div class="relative bg-white rounded-lg p-6 w-full max-w-lg m-4 space-y-4 max-h-[90vh] overflow-y-auto">
+        <div class="flex justify-between items-center pb-3 border-b">
+            <h3 class="text-xl font-bold text-gray-800">Inspection Details</h3>
+            <button onclick="hideModal('inspector-details-modal')" class="text-gray-500 hover:text-gray-700">
+                <span class="material-symbols-outlined">close</span>
+            </button>
+        </div>
+        
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+            <div>
+                <p class="font-medium text-gray-500">Vehicle Number</p>
+                <p id="inspector-modal-vehicle-no" class="font-bold text-base text-gray-800"></p>
+            </div>
+            <div>
+                <p class="font-medium text-gray-500">Executive</p>
+                <p id="inspector-modal-executive" class="font-semibold text-base text-gray-800"></p>
+            </div>
+        </div>
+
+        <div class="pt-2">
+            <h4 class="font-bold text-gray-700 mb-2">Customer Complaints</h4>
+            <div id="inspector-modal-complaints" class="space-y-1 text-sm text-gray-600 bg-gray-50 p-3 rounded-lg"></div>
+        </div>
+        
+        <div class="pt-2">
+            <h4 class="font-bold text-gray-700 mb-2">Mechanic's Suggested Repairs</h4>
+            <div id="inspector-modal-suggestions" class="space-y-1 text-sm text-gray-600 bg-blue-50 p-3 rounded-lg"></div>
+        </div>
+
+        <div id="inspector-modal-actions" class="flex flex-col sm:flex-row sm:justify-end gap-3 pt-4 border-t">
+            </div>
+    </div>
+</div>
     
     <!-- Customer Approval Screen -->
     <div id="customer-approval-screen" class="screen">
@@ -1585,83 +1742,89 @@ function handleCheckboxChange(checkbox) {
         };
 
 async function login() {
-            const username = document.getElementById('username').value.trim();
-            const password = document.getElementById('password').value.trim();
-            if (!username || !password) return showError('Username and password are required.');
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    if (!username || !password) return showError('Username and password are required.');
 
-            const { data, error } = await sb
-                .from('users')
-                .select('*')
-                .ilike('username', username)
-                .single();
+    const { data, error } = await sb
+        .from('users')
+        .select('*')
+        .ilike('username', username)
+        .single();
 
-            if (error || !data || data.password !== password) {
-    	        return showError('Invalid credentials.');
-            }
-            
-            currentUser = data;
-            sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); 
-            
-            if (currentUser.role === 'admin') {
-                showAdminScreen('admin-dashboard-screen');
-            } else if (currentUser.role === 'executive') {
-                document.getElementById('profile-username').textContent = currentUser.username;
-                document.getElementById('profile-role').textContent = currentUser.role;
-                await fetchAndApplyAppSettings(); 
-                showExecutiveScreen('job-card-screen');
-                setTimeout(checkInitialAuth, 1000);
-            } else if (currentUser.role === 'washer') { // ADDED
-                showScreen('washer-screen');
-                populateWashList();
-            } else {
-                return showError('Unknown user role.');
-            }
-            showSuccessMessage(`Welcome, ${currentUser.username}!`);
-        }
+    if (error || !data || data.password !== password) {
+        return showError('Invalid credentials.');
+    }
+    
+    currentUser = data;
+    sessionStorage.setItem('currentUser', JSON.stringify(currentUser)); 
+    
+    if (currentUser.role === 'admin') {
+        showAdminScreen('admin-dashboard-screen');
+    } else if (currentUser.role === 'executive') {
+        document.getElementById('profile-username').textContent = currentUser.username;
+        document.getElementById('profile-role').textContent = currentUser.role;
+        await fetchAndApplyAppSettings(); 
+        showExecutiveScreen('job-card-screen');
+        setTimeout(checkInitialAuth, 1000);
+    } else if (currentUser.role === 'washer') {
+        showScreen('washer-screen');
+        populateWashList();
+    } else if (currentUser.role === 'inspector') { // ADDED THIS BLOCK
+        showScreen('inspector-screen');
+        populateInspectionQueue();
+    } else {
+        return showError('Unknown user role.');
+    }
+    showSuccessMessage(`Welcome, ${currentUser.username}!`);
+}
 		
 // ADD NEW FUNCTION: Populates the list for the washer
-        async function populateWashList() {
-            const listContainer = document.getElementById('wash-queue-list');
-            const noJobsMsg = document.getElementById('no-wash-jobs-message');
-            listContainer.innerHTML = '';
-            noJobsMsg.classList.add('hidden');
+// REPLACE this function
+async function populateWashList() {
+    const listContainer = document.getElementById('wash-queue-list');
+    const noJobsMsg = document.getElementById('no-wash-jobs-message');
+    listContainer.innerHTML = '';
+    noJobsMsg.classList.add('hidden');
 
-            const query = sb.from('reports')
-                .select(`id, vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model)), users!inner(username)`)
-                .eq('status', 'Sent To Wash')
-                .order('created_at', { ascending: true });
-            
-            const reports = await handleSupabaseQuery(query, 'Could not fetch wash queue.');
-
-            // If the helper returned null, an error already occurred and was shown. Just stop.
-            if (reports === null) return;
-
-            if (reports.length === 0) {
-                noJobsMsg.classList.remove('hidden');
-                return;
-            }
-
-            reports.forEach(report => {
-                const card = document.createElement('div');
-                const vehicle = report.vehicles;
-                const executive = report.users;
-                const brandAndModel = `${vehicle.vehicle_models.brand || ''} ${vehicle.vehicle_models.model || ''}`.trim();
-
-                card.className = 'p-4 border border-gray-200 rounded-lg flex justify-between items-center';
-                card.innerHTML = `
-                    <div>
-                        <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
-                        <p class="text-sm text-gray-600 mt-1">${brandAndModel}</p>
-                        <p class="text-xs text-gray-500 mt-1">From: ${executive.username}</p>
-                    </div>
-                    <button onclick="completeWash(${report.id})" class="btn-primary !w-auto flex-shrink-0 !py-2 !px-3">
-                        <span class="material-symbols-outlined">check_circle</span>
-                        <span>Wash Completed</span>
-                    </button>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
+    const query = sb.from('reports')
+        .select(`
+            id,
+            vehicles!inner(vehicle_no, vehicle_name, color, vehicle_models(brand, model)),
+            executive:executive_id(username)
+        `)
+        .eq('status', 'Sent To Wash')
+        .order('created_at', { ascending: true });
+    const reports = await handleSupabaseQuery(query, 'Could not fetch wash queue.');
+    if (reports === null) return;
+    if (reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        const vehicle = report.vehicles;
+        const executive = report.executive;
+        const brandAndModel = `${vehicle.vehicle_models.brand || ''} ${vehicle.vehicle_models.model || ''}`.trim();
+        
+        // THE FIX: Added classes to make the card stack vertically on mobile
+        card.className = 'p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
+        
+        // THE FIX: Added responsive width to the button and aligned text left on mobile
+        card.innerHTML = `
+            <div class="w-full sm:w-auto text-left">
+                <p class="font-bold text-gray-800">${vehicle.vehicle_no}</p>
+                <p class="text-sm text-gray-600 mt-1">${brandAndModel}</p>
+                <p class="text-xs text-gray-500 mt-1">From: ${executive?.username || 'N/A'}</p>
+            </div>
+            <button onclick="completeWash(${report.id})" class="btn-primary w-full sm:w-auto flex-shrink-0 !py-2 !px-3">
+                <span class="material-symbols-outlined">check_circle</span>
+                <span>Wash Completed</span>
+            </button>
+        `;
+        listContainer.appendChild(card);
+    });
+}
 
         // ADD NEW FUNCTION: Washer marks a job as done
         async function completeWash(reportId) {
@@ -1680,18 +1843,23 @@ async function login() {
 
 
 function logout() {
-            currentUser = null;
-            sessionStorage.removeItem('currentUser');
-            document.getElementById('username').value = '';
-            document.getElementById('password').value = '';
-            
-            // This function logs out of Google Drive if authorized
-            handleSignoutClick(); 
-            
-            // Directly show the login screen and do nothing else
-            showScreen('login-screen'); 
-        }
-		
+    const originalAdmin = sessionStorage.getItem('originalAdmin');
+    
+    if (originalAdmin) {
+        currentUser = JSON.parse(originalAdmin);
+        sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+        sessionStorage.removeItem('originalAdmin');
+        showAdminScreen('admin-dashboard-screen');
+        showSuccessMessage('Returned to admin dashboard');
+    } else {
+        currentUser = null;
+        sessionStorage.removeItem('currentUser');
+        document.getElementById('username').value = '';
+        document.getElementById('password').value = '';
+        handleSignoutClick();
+        showScreen('login-screen');
+    }
+}
 		
 
         function handleDateChange(fromId, toId) {
@@ -1728,117 +1896,433 @@ function logout() {
 		
 
 // ADD NEW FUNCTION: Handles tab switching on the Close page
-        function showCloseTab(tabName) {
-            document.querySelectorAll('#due-date-screen .tab-button').forEach(btn => btn.classList.remove('active-tab'));
-            document.querySelectorAll('#due-date-screen .tab-panel').forEach(panel => panel.classList.add('hidden'));
+// Replace your showCloseTab function with this new 4-tab version
+function showCloseTab(tabName) {
+    const allTabs = ['ready-to-close', 'inspection-pending', 'wash-pending', 'complete'];
+    
+    allTabs.forEach(tab => {
+        const btn = document.getElementById(`tab-btn-${tab}`);
+        const panel = document.getElementById(`${tab}-panel`);
+        if (btn) btn.classList.remove('active-tab');
+        if (panel) panel.classList.add('hidden');
+    });
 
-            if (tabName === 'wash-pending') {
-                document.getElementById('tab-btn-wash-pending').classList.add('active-tab');
-                document.getElementById('wash-pending-panel').classList.remove('hidden');
-                populateWashPendingJobs();
-            } else if (tabName === 'complete') {
-                document.getElementById('tab-btn-complete').classList.add('active-tab');
-                document.getElementById('complete-panel').classList.remove('hidden');
-                populateCompletedWashJobs();
-            }
+    const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+    const activePanel = document.getElementById(`${tabName}-panel`);
+    if (activeBtn) activeBtn.classList.add('active-tab');
+    if (activePanel) activePanel.classList.remove('hidden');
+
+    // Call the correct function to populate the active tab
+    if (tabName === 'ready-to-close') populateReadyToCloseJobs();
+    if (tabName === 'inspection-pending') populateInspectionPendingJobs();
+    if (tabName === 'wash-pending') populateWashPendingJobs();
+    if (tabName === 'complete') populateCompletedWashJobs();
+}
+
+// Add this new function to power the "Ready to Close" tab
+async function populateReadyToCloseJobs() {
+    if (!currentUser) return;
+    const listContainer = document.getElementById('ready-to-close-list');
+    const noJobsMsg = document.getElementById('no-ready-to-close-message');
+    
+    // Defensive check
+    if (!listContainer || !noJobsMsg) return console.error("Ready to close elements not found.");
+
+    listContainer.innerHTML = ''; // Safely clear only the list
+    noJobsMsg.classList.add('hidden');
+
+    const { data: reports, error } = await sb.from('reports')
+        .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'Ongoing')
+        .not('approved', 'is', null)
+        .neq('approved', '[]');
+
+    if (error) return showError('Could not fetch ready jobs.');
+
+    if (!reports || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+        card.className = 'p-4 border border-gray-200 rounded-lg';
+        card.innerHTML = `
+            <div class="flex justify-between items-center">
+                <div>
+                    <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                    <p class="text-sm text-gray-600">${brandAndModel}</p>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="updateJobStatus(${report.id}, 'pending_inspection', '${report.vehicles.vehicle_no}')" class="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1.5 px-3 rounded text-sm">
+                        Send for Inspection
+                    </button>
+                    <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm">
+                        Skip & Wash
+                    </button>
+                </div>
+            </div>
+        `;
+        listContainer.appendChild(card);
+    });
+}
+
+function populateDueDateScreen() {
+            // Call the population function for each tab on the "Close" screen
+            populateReadyToCloseJobs();
+            populateInspectionPendingJobs();
+            populateWashPendingJobs();
+            populateCompletedWashJobs();
         }
+		
+
+// REPLACE this function
+function showInspectionDetails(report) {
+    document.getElementById('inspector-modal-vehicle-no').textContent = report.vehicles.vehicle_no;
+    document.getElementById('inspector-modal-executive').textContent = report.executive?.username || 'N/A';
+
+    const complaintsList = document.getElementById('inspector-modal-complaints');
+    complaintsList.innerHTML = '';
+    const complaints = JSON.parse(report.complaint || '[]');
+    if (complaints.length > 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'list-disc list-inside space-y-1';
+        complaints.forEach(c => {
+            const li = document.createElement('li');
+            li.textContent = c.text || c;
+            ul.appendChild(li);
+        });
+        complaintsList.appendChild(ul);
+    } else {
+        complaintsList.innerHTML = '<p class="italic">No complaints registered.</p>';
+    }
+
+    const suggestionsList = document.getElementById('inspector-modal-suggestions');
+    suggestionsList.innerHTML = '';
+    const suggestions = JSON.parse(report.suggested || '[]');
+     if (suggestions.length > 0) {
+        const ul = document.createElement('ul');
+        ul.className = 'list-disc list-inside space-y-1';
+        suggestions.forEach(s => {
+            const li = document.createElement('li');
+            li.textContent = `${s.text} (₹${s.amount || 0})`;
+            ul.appendChild(li);
+        });
+        suggestionsList.appendChild(ul);
+    } else {
+        suggestionsList.innerHTML = '<p class="italic">No mechanic suggestions added yet.</p>';
+    }
+
+    const actionsContainer = document.getElementById('inspector-modal-actions');
+    // THE FIX: Added w-full sm:w-auto to make buttons responsive
+    actionsContainer.innerHTML = `
+        <button onclick="handleInspection('${report.id}', 'rejected', '${report.vehicles.vehicle_no}')" class="bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">
+            Reject
+        </button>
+        <button onclick="handleInspection('${report.id}', 'inspection_approved', '${report.vehicles.vehicle_no}')" class="bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded w-full sm:w-auto">
+            Approve
+        </button>
+    `;
+    
+    showModal('inspector-details-modal');
+}
 
 
+// Add this new function anywhere in your <script> tag
+async function populateInspectionPendingJobs() {
+    if (!currentUser) return;
+    const rejectedList = document.getElementById('rejected-jobs-list');
+    const noRejectedMsg = document.getElementById('no-rejected-jobs-message');
+    const pendingList = document.getElementById('pending-inspection-list');
+    const noPendingMsg = document.getElementById('no-inspection-pending-message');
 
-async function populateWashPendingJobs() {
-            // ADDED: Guard clause to prevent crash if session is lost
-            if (!currentUser) {
-                console.error("populateWashPendingJobs: currentUser is null. Aborting.");
-                return showError("Session expired. Please log in again.");
-            }
+    if (!rejectedList || !noRejectedMsg || !pendingList || !noPendingMsg) {
+        return console.error("Required elements for inspection tab are missing.");
+    }
 
-            const listContainer = document.getElementById('wash-pending-panel');
-            const noJobsMsg = document.getElementById('no-wash-pending-message');
+    rejectedList.innerHTML = ''; // Safely clear only the lists
+    pendingList.innerHTML = '';
+    noRejectedMsg.classList.add('hidden');
+    noPendingMsg.classList.add('hidden');
 
-            listContainer.querySelectorAll('.job-card-item').forEach(card => card.remove());
-            
-            const { data: reports, error } = await sb.from('reports')
-                .select(`id, vehicles!inner(vehicle_no, vehicle_name)`)
-                .eq('executive_id', currentUser.id)
-                .eq('status', 'Ongoing')
-                .not('approved', 'is', null)
-                .neq('approved', '[]')
-                .order('created_at', { ascending: true });
-
-            if (error) return showError('Could not fetch jobs for wash.');
-
-            if (!reports || reports.length === 0) {
-                noJobsMsg.classList.remove('hidden');
-                return;
-            }
-            noJobsMsg.classList.add('hidden');
-
-            reports.forEach(report => {
-                const card = document.createElement('div');
-                card.className = 'p-4 border border-gray-200 rounded-lg job-card-item';
-                card.innerHTML = `
-                    <div class="flex justify-between items-center">
-                        <div>
-                            <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
-                            <p class="text-sm text-gray-600">${report.vehicles.vehicle_name || ''}</p>
-                        </div>
-                        <div class="flex items-center gap-2">
-                            <button onclick="sendToWash(${report.id})" class="btn-primary !w-auto !py-1.5 !px-3 text-sm">
-                                <span class="material-symbols-outlined !text-base">local_car_wash</span> Send to Wash
-                            </button>
-                            <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="btn-secondary !w-auto !py-1.5 !px-3 text-sm">
-                                Complete
-                            </button>
-                        </div>
+    // --- Query for REJECTED Jobs ---
+    const { data: rejectedReports, error: rejectedError } = await sb.from('reports')
+        .select(`id, inspection_remarks, vehicles!inner(vehicle_no, vehicle_models(brand, model)), inspector:inspector_id(username)`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'rejected');
+    
+    if (rejectedError) showError('Could not fetch rejected jobs.');
+    
+    if (rejectedReports && rejectedReports.length > 0) {
+        rejectedReports.forEach(report => {
+            const card = document.createElement('div');
+            const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+            card.className = 'p-4 border border-red-300 bg-red-50 rounded-lg';
+            card.innerHTML = `
+                <div class="flex justify-between items-start">
+                    <div>
+                        <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                        <p class="text-sm text-gray-600">${brandAndModel}</p>
                     </div>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
+                    <button onclick="resendForInspection(${report.id})" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1 px-3 rounded text-sm flex-shrink-0">
+                        Resend for Inspection
+                    </button>
+                </div>
+                <div class="mt-2 pt-2 border-t border-red-200">
+                    <p class="text-sm text-red-800 font-semibold">Remarks from ${report.inspector?.username || 'Inspector'}:</p>
+                    <p class="text-sm text-gray-600 italic">"${report.inspection_remarks || 'No remarks provided.'}"</p>
+                </div>
+            `;
+            rejectedList.appendChild(card);
+        });
+    } else {
+        noRejectedMsg.classList.remove('hidden');
+    }
+
+    // --- Query for PENDING Inspection Jobs ---
+    const { data: pendingReports, error: pendingError } = await sb.from('reports')
+        .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'pending_inspection');
+    
+    if (pendingError) showError('Could not fetch pending jobs.');
+
+    if (pendingReports && pendingReports.length > 0) {
+        pendingReports.forEach(report => {
+            const card = document.createElement('div');
+            const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+            card.className = 'p-4 border border-gray-200 bg-gray-50 rounded-lg';
+            card.innerHTML = `
+                <div class="flex justify-between items-center">
+                    <div>
+                        <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                        <p class="text-sm text-gray-600">${brandAndModel}</p>
+                    </div>
+                    <p class="text-sm text-gray-500 font-semibold">Sent to Inspector</p>
+                </div>
+            `;
+            pendingList.appendChild(card);
+        });
+    } else {
+        noPendingMsg.classList.remove('hidden');
+    }
+}
+
+
+// Add this new function anywhere in your <script> tag
+async function resendForInspection(reportId) {
+    const { error } = await sb.from('reports')
+        .update({ status: 'pending_inspection' })
+        .eq('id', reportId);
+
+    if (error) {
+        return showError('Failed to resend for inspection.');
+    }
+
+    showSuccessMessage('Job has been resent to the inspector.');
+    populateInspectionPendingJobs(); // Refresh the list
+}
+
+
+
+// New functions for the inspector workflow
+// REPLACE this function
+async function populateInspectionQueue() {
+    const listContainer = document.getElementById('inspection-queue-list');
+    const noJobsMsg = document.getElementById('no-inspection-jobs-message');
+    listContainer.innerHTML = '';
+    noJobsMsg.classList.add('hidden');
+
+    const query = sb.from('reports')
+        .select(`id, complaint, suggested, vehicles!inner(vehicle_no, vehicle_name), executive:executive_id(username)`)
+        .eq('status', 'pending_inspection')
+        .order('created_at', { ascending: true });
+    
+    const reports = await handleSupabaseQuery(query, 'Could not fetch inspection queue.');
+    if (reports === null || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        card.className = 'p-4 border border-gray-200 rounded-lg flex justify-between items-center';
+
+        const infoDiv = document.createElement('div');
+        infoDiv.innerHTML = `
+            <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+            <p class="text-sm text-gray-600">${report.vehicles.vehicle_name || ''}</p>
+            <p class="text-xs text-gray-500 mt-1">From: ${report.executive?.username || 'N/A'}</p>
+        `;
+
+        const viewButton = document.createElement('button');
+        viewButton.className = 'btn-primary !w-auto !py-2 !px-4';
+        viewButton.textContent = 'View Details';
+        
+        // THE FIX: Attach the event listener directly, passing the object safely
+        viewButton.onclick = () => showInspectionDetails(report);
+
+        card.appendChild(infoDiv);
+        card.appendChild(viewButton);
+        listContainer.appendChild(card);
+    });
+}
+
+// REPLACE this function
+function handleInspection(reportId, outcome, vehicleNo) {
+    const modalTitle = document.getElementById('remarks-modal-title');
+    const modalText = document.getElementById('remarks-modal-text');
+    const confirmBtn = document.getElementById('confirm-inspection-button');
+    const remarksInput = document.getElementById('inspection-remarks-input');
+    const remarksLabel = document.querySelector('label[for="inspection-remarks-input"]');
+    remarksInput.value = '';
+
+    if (outcome === 'inspection_approved') {
+        modalTitle.textContent = 'Approve Inspection';
+        modalText.textContent = `Confirm approval for vehicle ${vehicleNo}.`;
+        remarksLabel.innerHTML = 'Remarks (Optional):'; // CHANGED TEXT
+        confirmBtn.className = 'px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white font-semibold';
+    } else {
+        modalTitle.textContent = 'Reject Inspection';
+        modalText.textContent = `Confirm rejection for vehicle ${vehicleNo}.`;
+        remarksLabel.innerHTML = 'Remarks (Required for Rejection):'; // CHANGED TEXT
+        confirmBtn.className = 'px-4 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-semibold';
+    }
+
+    confirmBtn.onclick = () => confirmInspection(reportId, outcome);
+    // Hide the details modal before showing the remarks modal
+    hideModal('inspector-details-modal'); 
+    showModal('inspection-remarks-modal');
+}
+
+
+// Replace your existing confirmInspection function with this one
+// This function runs when the INSPECTOR clicks Approve/Reject
+// REPLACE this function
+async function confirmInspection(reportId, outcome) {
+    if (!currentUser) return showError('Session expired. Please log in.');
+    
+    const remarks = document.getElementById('inspection-remarks-input').value.trim();
+    
+    // MODIFIED LOGIC: Only require remarks on rejection
+    if (outcome === 'rejected' && !remarks) {
+        return showError('Remarks are required when rejecting a job.');
+    }
+    
+    const finalStatus = outcome === 'inspection_approved' ? 'inspection_approved' : 'rejected';
+
+    const updateData = {
+        status: finalStatus,
+        inspector_id: currentUser.id,
+        inspection_remarks: remarks, // Will be empty string if not provided on approval
+        inspection_date: new Date().toISOString()
+    };
+    
+    const { error } = await sb.from('reports').update(updateData).eq('id', reportId);
+    
+    hideModal('inspection-remarks-modal');
+    if (error) return showError(`Failed to update status: ${error.message}`);
+
+    showSuccessMessage('Inspection status updated successfully.');
+    populateInspectionQueue();
+}
+
+
+
+// Replace your existing populateWashPendingJobs function with this one
+async function populateWashPendingJobs() {
+    if (!currentUser) return;
+    const listContainer = document.getElementById('wash-pending-list');
+    const noJobsMsg = document.getElementById('no-wash-pending-message');
+    
+    if (!listContainer || !noJobsMsg) return console.error("Wash pending elements not found.");
+
+    listContainer.innerHTML = ''; // Safely clear only the list
+    noJobsMsg.classList.add('hidden');
+
+    const { data: reports, error } = await sb.from('reports')
+        .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'inspection_approved');
+
+    if (error) return showError('Could not fetch jobs for wash.');
+
+    if (!reports || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
+
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+        card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg';
+        card.innerHTML = `
+            <div class="flex-grow">
+                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                <p class="text-sm text-gray-600">${brandAndModel}</p>
+            </div>
+            <div class="flex items-center gap-2 flex-shrink-0">
+                <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm">
+                    Send for Wash
+                </button>
+                <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded text-sm">
+                    Skip & Complete
+                </button>
+            </div>
+        `;
+        listContainer.appendChild(card);
+    });
+}
 		
 		
         
+// Replace the existing function with this complete version
+// Replace the existing function with this complete version
 async function populateCompletedWashJobs() {
-            // ADDED: Guard clause to prevent crash if session is lost
-            if (!currentUser) {
-                console.error("populateCompletedWashJobs: currentUser is null. Aborting.");
-                return showError("Session expired. Please log in again.");
-            }
+    if (!currentUser) return;
+    
+    // THE FIX: Target the new, safe list container and the message element
+    const listContainer = document.getElementById('complete-list');
+    const noJobsMsg = document.getElementById('no-complete-message');
+    
+    if(!listContainer || !noJobsMsg) return console.error("Complete tab elements not found");
 
-            const listContainer = document.getElementById('complete-panel');
-            const noJobsMsg = document.getElementById('no-complete-message');
+    listContainer.innerHTML = ''; // Safely clear only the list
+    noJobsMsg.classList.add('hidden');
+    
+    const { data: reports, error } = await sb.from('reports')
+        .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
+        .eq('executive_id', currentUser.id)
+        .eq('status', 'Wash Completed')
+        .order('created_at', { ascending: true });
 
-            listContainer.querySelectorAll('.job-card-item').forEach(card => card.remove());
-            
-            const { data: reports, error } = await sb.from('reports')
-                .select(`id, vehicles!inner(vehicle_no, vehicle_name)`)
-                .eq('executive_id', currentUser.id)
-                .eq('status', 'Wash Completed')
-                .order('created_at', { ascending: true });
+    if (error) return showError('Could not fetch completed wash jobs.');
 
-            if (error) return showError('Could not fetch completed wash jobs.');
+    if (!reports || reports.length === 0) {
+        noJobsMsg.classList.remove('hidden');
+        return;
+    }
 
-            if (!reports || reports.length === 0) {
-                noJobsMsg.classList.remove('hidden');
-                return;
-            }
-            noJobsMsg.classList.add('hidden');
-
-            reports.forEach(report => {
-                const card = document.createElement('div');
-                card.className = 'p-4 border border-green-300 bg-green-50 rounded-lg flex justify-between items-center job-card-item';
-                card.innerHTML = `
-                    <div>
-                        <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
-                        <p class="text-sm text-green-700 font-semibold">Ready for delivery</p>
-                    </div>
-                    <button onclick="updateJobStatus(${report.id}, 'Completed', '${report.vehicles.vehicle_no}')" class="btn-primary !bg-green-600 hover:!bg-green-700 !w-auto !py-1.5 !px-3 text-sm">
-                        <span class="material-symbols-outlined !text-base">check_circle</span> Mark Completed
-                    </button>
-                `;
-                listContainer.appendChild(card);
-            });
-        }
+    reports.forEach(report => {
+        const card = document.createElement('div');
+        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+        // THE FIX: The class 'job-card-item' is no longer needed
+        card.className = 'p-4 border border-green-300 bg-green-50 rounded-lg flex justify-between items-center';
+        card.innerHTML = `
+            <div>
+                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                <p class="text-sm text-gray-600">${brandAndModel}</p>
+                <p class="text-sm text-green-700 font-semibold mt-1">Ready for delivery</p>
+            </div>
+            <button onclick="updateJobStatus(${report.id}, 'Completed', '${report.vehicles.vehicle_no}')" class="btn-primary !bg-green-600 hover:!bg-green-700 !w-auto !py-1.5 !px-3 text-sm">
+                <span class="material-symbols-outlined !text-base">check_circle</span> Mark Completed
+            </button>
+        `;
+        listContainer.appendChild(card);
+    });
+}
 
         // ADD NEW FUNCTION: Executive sends a job to the washer
         async function sendToWash(reportId) {
@@ -1873,140 +2357,185 @@ async function populateCompletedWashJobs() {
 
         // --- ADMIN: USER MANAGEMENT ---
 async function renderUserList(role) {
-            const listId = role === 'admin' ? 'admins-list' : (role === 'executive' ? 'executives-list' : 'washers-list');
-            const list = document.getElementById(listId);
-            list.innerHTML = '';
+    // MODIFIED THIS LINE TO INCLUDE THE NEW INSPECTOR LIST ID
+    const listId = role === 'admin' ? 'admins-list' : (role === 'executive' ? 'executives-list' : (role === 'washer' ? 'washers-list' : 'inspectors-list'));
+    const list = document.getElementById(listId);
+    list.innerHTML = '';
 
-            const { data, error } = await sb.from('users').select('id, username').eq('role', role);
-            if(error) return showError(`Could not fetch ${role}s.`);
-            
-            data.forEach(user => {
-                const div = document.createElement('div');
-                div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
-                div.innerHTML = `<p class="font-semibold">${user.username}</p><button onclick="confirmDeletion('user', ${user.id}, '${role}')" class="text-red-500 hover:text-red-700"><span class="material-symbols-outlined">delete</span></button>`;
-                list.appendChild(div);
-            });
+    const { data, error } = await sb.from('users').select('id, username, team').eq('role', role);
+    if (error) return showError(`Could not fetch ${role}s.`);
+
+    data.forEach(user => {
+        const div = document.createElement('div');
+        div.className = 'flex items-center justify-between bg-gray-50 p-3 rounded-lg';
+
+        let userDisplayHtml;
+
+        if (role === 'executive' && user.team) {
+            userDisplayHtml = `
+                <div class="flex-grow flex justify-between items-center mr-4">
+                    <p class="font-semibold">${user.username}</p>
+                    <span class="text-xs font-medium text-gray-700 bg-gray-200 px-2 py-1 rounded-full">${user.team}</span>
+                </div>`;
+        } else {
+            userDisplayHtml = `<p class="font-semibold flex-grow mr-4">${user.username}</p>`;
         }
+
+        div.innerHTML = `
+            ${userDisplayHtml}
+            <button onclick="confirmDeletion('user', ${user.id}, '${role}')" class="text-red-500 hover:text-red-700 shrink-0">
+                <span class="material-symbols-outlined">delete</span>
+            </button>
+        `;
+
+        list.appendChild(div);
+    });
+}
 
 async function addUser(role) {
-            const usernameInputId = `new-${role}-username`;
-            const passwordInputId = `new-${role}-pass`;
-            const formId = `add-${role}-form`;
+    const usernameInputId = `new-${role}-username`;
+    const passwordInputId = `new-${role}-pass`;
+    const formId = `add-${role}-form`;
 
-            const username = document.getElementById(usernameInputId).value.trim();
-            const password = document.getElementById(passwordInputId).value.trim();
+    const username = document.getElementById(usernameInputId).value.trim();
+    const password = document.getElementById(passwordInputId).value.trim();
 
-            if (!username || !password) return showError('Username and password are required.');
+    if (!username || !password) return showError('Username and password are required.');
 
-            const userData = { username, password, role };
-            
-            if (role === 'executive') {
-                const team = document.getElementById('new-exec-team').value;
-                if (!team) return showError('Please select a team for the executive.');
-                userData.team = team;
-            }
+    const userData = { username, password, role };
+    
+    if (role === 'executive') {
+        const team = document.getElementById('new-exec-team').value;
+        if (!team) return showError('Please select a team for the executive.');
+        userData.team = team;
+    }
 
-            const { error } = await sb.from('users').insert(userData);
-            if (error) return showError(`Could not create ${role}: ${error.message}`);
-            
-            showSuccessMessage(`${role.charAt(0).toUpperCase() + role.slice(1)} created.`);
-            document.getElementById(formId).reset();
-            renderUserList(role);
-        }
+    const { error } = await sb.from('users').insert(userData);
+    if (error) return showError(`Could not create ${role}: ${error.message}`);
+    
+    showSuccessMessage(`${role.charAt(0).toUpperCase() + role.slice(1)} created.`);
+    document.getElementById(formId).reset();
+    renderUserList(role);
+}
 
         // --- ADMIN & EXECUTIVE: REPORTS ---
 
-        async function fetchAndPopulateReports(isAdmin = false) {
-            const tableContainerId = isAdmin ? 'admin-reports-screen' : 'report-screen';
-            const tableBodyId = isAdmin ? 'admin-report-table-body' : 'report-table-body';
-            const tableEl = document.querySelector(`#${tableContainerId} .report-table`);
-            const tableBody = document.getElementById(tableBodyId);
-            const noReportsMsg = document.getElementById(isAdmin ? 'admin-no-reports-message' : 'no-reports-message');
-            
-            // --- Define all possible columns and their render logic ---
-            const allColumns = [
-                { key: 'vehicle_no', label: 'Vehicle No.', render: (row) => `<button onclick='printJobCardById(${row.id})' class="text-gray-500 hover:text-green-600 p-1 rounded-full shrink-0"><span class="material-symbols-outlined">download</span></button><span>${row.vehicles.vehicle_no}</span>`, className: 'flex items-center gap-x-2' },
-                { key: 'vehicle_name', label: 'Vehicle Name', render: (row) => row.vehicles.vehicle_name || 'N/A' },
-                { key: 'model', label: 'Model', render: (row) => row.vehicles.vehicle_models.model },
-                { key: 'brand', label: 'Brand', render: (row) => row.vehicles.vehicle_models.brand },
-                { key: 'color', label: 'Color', render: (row) => row.vehicles.color || 'N/A' },
-                { key: 'engine_no', label: 'Engine No', render: (row) => row.vehicles.engine_no || 'N/A' },
-                { key: 'chassis_no', label: 'Chassis No', render: (row) => row.vehicles.chassis_no || 'N/A' },
-                { key: 'client_name', label: 'Client Name', render: (row) => row.client_name || 'N/A' },
-                { key: 'client_phone', label: 'Client Phone', render: (row) => row.client_phone || 'N/A' },
-                { key: 'odometer', label: 'Odometer', render: (row) => row.odometer_reading || 'N/A' },
-                { key: 'executive', label: 'Executive', render: (row) => row.users.username },
-                { key: 'date_time', label: 'Date & Time', render: (row) => new Date(row.created_at).toLocaleString('en-GB') },
-                { key: 'status', label: 'Status', render: (row) => { const colors = { 'Completed': 'bg-green-100 text-green-800', 'Ongoing': 'bg-orange-100 text-orange-800', 'Not Started': 'bg-red-100 text-red-800', 'Cancelled': 'bg-gray-200 text-gray-800', 'Sent To Wash': 'bg-blue-100 text-blue-800', 'Wash Completed': 'bg-purple-100 text-purple-800' }; return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colors[row.status] || 'bg-gray-100 text-gray-800'}">${row.status}</span>`; } },
-                { key: 'complaint', label: 'Complaint', render: (row) => formatArrayCell(row.complaint), className: 'whitespace-normal max-w-xs truncate' },
-                { key: 'suggested', label: 'Suggested', render: (row) => formatArrayCell(row.suggested), className: 'whitespace-normal max-w-xs truncate' },
-                { key: 'approved', label: 'Approved', render: (row) => formatArrayCell(row.approved), className: 'whitespace-normal max-w-xs truncate' },
-                { key: 'feedback_text', label: 'Feedback Text', render: (row) => row.customer_feedback_text || 'N/A', className: 'whitespace-normal max-w-xs truncate' },
-                { key: 'feedback_voice', label: 'Feedback Voice', render: (row) => row.customer_feedback_audio ? `<audio controls src="${row.customer_feedback_audio}" class="w-48 h-8"></audio>` : 'N/A' },
-                { key: 'marks', label: 'Marks', render: (row) => (row.marks && row.marks.length > 2) ? `<button onclick='openMarksModal(${JSON.stringify(row.marks)})' class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs">View</button>` : 'N/A' },
-                { key: 'media', label: 'Media', render: (row) => row.gdrive_folder_url ? `<a href="${row.gdrive_folder_url}" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs font-semibold">View Files</a>` : '<span class="text-xs text-gray-500">Not Uploaded</span>' }
-            ];
+        //
+// THIS IS THE COMPLETE, CORRECTED FUNCTION. REPLACE YOUR OLD ONE WITH THIS.
+//
+async function fetchAndPopulateReports(isAdmin = false) {
+    const tableContainerId = isAdmin ? 'admin-reports-screen' : 'report-screen';
+    const tableBodyId = isAdmin ? 'admin-report-table-body' : 'report-table-body';
+    const tableEl = document.querySelector(`#${tableContainerId} .report-table`);
+    const tableBody = document.getElementById(tableBodyId);
+    const noReportsMsg = document.getElementById(isAdmin ? 'admin-no-reports-message' : 'no-reports-message');
 
-            const visibleColumnKeys = appSettings.visible_report_columns || allColumns.map(c => c.key);
-            const columnsToRender = allColumns.filter(c => visibleColumnKeys.includes(c.key));
+    // --- Define all possible columns and their render logic ---
+    const allColumns = [
+        { key: 'vehicle_no', label: 'Vehicle No.', render: (row) => `<button onclick='printJobCardById(${row.id})' class="text-gray-500 hover:text-green-600 p-1 rounded-full shrink-0"><span class="material-symbols-outlined">download</span></button><span>${row.vehicles.vehicle_no}</span>`, className: 'flex items-center gap-x-2' },
+        { key: 'vehicle_name', label: 'Vehicle Name', render: (row) => row.vehicles.vehicle_name || 'N/A' },
+        { key: 'model', label: 'Model', render: (row) => row.vehicles.vehicle_models.model },
+        { key: 'brand', label: 'Brand', render: (row) => row.vehicles.vehicle_models.brand },
+        { key: 'color', label: 'Color', render: (row) => row.vehicles.color || 'N/A' },
+        { key: 'engine_no', label: 'Engine No', render: (row) => row.vehicles.engine_no || 'N/A' },
+        { key: 'chassis_no', label: 'Chassis No', render: (row) => row.vehicles.chassis_no || 'N/A' },
+        { key: 'client_name', label: 'Client Name', render: (row) => row.client_name || 'N/A' },
+        { key: 'client_phone', label: 'Client Phone', render: (row) => row.client_phone || 'N/A' },
+        { key: 'odometer', label: 'Odometer', render: (row) => row.odometer_reading || 'N/A' },
+        { key: 'executive', label: 'Executive', render: (row) => row.executive ? row.executive.username : 'N/A' },
+        { key: 'inspector', label: 'Inspector', render: (row) => row.inspector ? row.inspector.username : 'N/A' },
+        { key: 'date_time', label: 'Date & Time', render: (row) => new Date(row.created_at).toLocaleString('en-GB') },
+        { key: 'status', label: 'Status', render: (row) => { const colors = { 'Completed': 'bg-green-100 text-green-800', 'Ongoing': 'bg-orange-100 text-orange-800', 'Not Started': 'bg-red-100 text-red-800', 'Cancelled': 'bg-gray-200 text-gray-800', 'Sent To Wash': 'bg-blue-100 text-blue-800', 'Wash Completed': 'bg-purple-100 text-purple-800' }; return `<span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${colors[row.status] || 'bg-gray-100 text-gray-800'}">${row.status}</span>`; } },
+        { key: 'complaint', label: 'Complaint', render: (row) => formatArrayCell(row.complaint), className: 'whitespace-normal max-w-xs truncate' },
+        { key: 'suggested', label: 'Suggested', render: (row) => formatArrayCell(row.suggested), className: 'whitespace-normal max-w-xs truncate' },
+        { key: 'approved', label: 'Approved', render: (row) => formatArrayCell(row.approved), className: 'whitespace-normal max-w-xs truncate' },
+        { key: 'feedback_text', label: 'Feedback Text', render: (row) => row.customer_feedback_text || 'N/A', className: 'whitespace-normal max-w-xs truncate' },
+        { key: 'feedback_voice', label: 'Feedback Voice', render: (row) => row.customer_feedback_audio ? `<audio controls src="${row.customer_feedback_audio}" class="w-48 h-8"></audio>` : 'N/A' },
+        { key: 'marks', label: 'Marks', render: (row) => (row.marks && row.marks.length > 2) ? `<button onclick='openMarksModal(${JSON.stringify(row.marks)})' class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs">View</button>` : 'N/A' },
+        { key: 'media', label: 'Media', render: (row) => row.gdrive_folder_url ? `<a href="${row.gdrive_folder_url}" target="_blank" class="px-2 py-1 bg-blue-100 text-blue-600 rounded hover:bg-blue-200 text-xs font-semibold">View Files</a>` : '<span class="text-xs text-gray-500">Not Uploaded</span>' }
+    ];
 
-            // --- Dynamically build the table header ---
-            let thead = tableEl.querySelector('thead');
-            if (!thead) {
-                thead = document.createElement('thead');
-                tableEl.prepend(thead);
+    const visibleColumnKeys = appSettings.visible_report_columns || allColumns.map(c => c.key);
+    const columnsToRender = allColumns.filter(c => visibleColumnKeys.includes(c.key));
+
+    // --- Dynamically build the table header ---
+    let thead = tableEl.querySelector('thead');
+    if (!thead) {
+        thead = document.createElement('thead');
+        tableEl.prepend(thead);
+    }
+    thead.innerHTML = `<tr>${columnsToRender.map(col => `<th>${col.label}</th>`).join('')}</tr>`;
+
+    // --- Get Filter Values ---
+    const fromDate = document.getElementById(isAdmin ? 'admin-filter-from-date' : 'filter-from-date').value;
+    const toDate = document.getElementById(isAdmin ? 'admin-filter-to-date' : 'filter-to-date').value;
+    const vehicleNo = document.getElementById(isAdmin ? 'admin-filter-vehicle-no' : 'filter-vehicle-no').value.trim().toUpperCase();
+    const brand = document.getElementById(isAdmin ? 'admin-filter-brand' : 'filter-brand').value.trim();
+    const execName = document.getElementById(isAdmin ? 'admin-filter-exec-name' : 'filter-exec-name').value.trim();
+
+    // --- Build The Query ---
+    let query = sb.from('reports').select(`
+        id, created_at, status, complaint, suggested, approved, marks,
+        odometer_reading, client_name, client_phone,
+        gdrive_folder_url, customer_feedback_text, customer_feedback_audio,
+        vehicles!inner(
+          id, vehicle_no, vehicle_name, color, engine_no, chassis_no,
+          vehicle_models!inner(brand, model)
+        ),
+        executive:executive_id(username, id),
+        inspector:inspector_id(username, id)
+    `).order('created_at', { ascending: false });
+
+    // --- Apply Filters To The Query ---
+    if (!isAdmin) {
+        query = query.eq('executive_id', currentUser.id);
+    }
+    if (fromDate) {
+        query = query.gte('created_at', `${fromDate}T00:00:00`);
+    }
+    if (toDate) {
+        query = query.lte('created_at', `${toDate}T23:59:59`);
+    }
+    // -- THIS IS THE NEWLY ADDED, WORKING FILTER LOGIC --
+    if (vehicleNo) {
+        query = query.ilike('vehicles.vehicle_no', `%${vehicleNo}%`);
+    }
+    if (brand) {
+        query = query.ilike('vehicles.vehicle_models.brand', `%${brand}%`);
+    }
+    if (execName) {
+        query = query.ilike('executive.username', `%${execName}%`);
+    }
+    // -- END OF NEW LOGIC --
+    
+    const reports = await handleSupabaseQuery(query, "Failed to fetch reports.");
+    if (reports === null) return;
+    
+    reportsDataStore = {};
+    reports.forEach(row => { reportsDataStore[row.id] = row; });
+    
+    // --- Dynamically build the table body ---
+    tableBody.innerHTML = '';
+    if (reports.length === 0) {
+        noReportsMsg.classList.remove('hidden');
+        return;
+    }
+    noReportsMsg.classList.add('hidden');
+    
+    reports.forEach(row => {
+        const tr = document.createElement('tr');
+        columnsToRender.forEach(col => {
+            const td = document.createElement('td');
+            if (col.className) td.className = col.className;
+            if (col.key === 'complaint' || col.key === 'suggested' || col.key === 'approved' || col.key === 'feedback_text') {
+                td.title = formatArrayCell(row[col.key]);
             }
-            thead.innerHTML = `<tr>${columnsToRender.map(col => `<th>${col.label}</th>`).join('')}</tr>`;
-
-            // --- Fetch Data (with existing filter logic) ---
-            // This part of the logic remains the same
-            const fromDate = document.getElementById(isAdmin ? 'admin-filter-from-date' : 'filter-from-date').value;
-            const toDate = document.getElementById(isAdmin ? 'admin-filter-to-date' : 'filter-to-date').value;
-            const vehicleNo = document.getElementById(isAdmin ? 'admin-filter-vehicle-no' : 'filter-vehicle-no').value.trim().toUpperCase();
-            const brand = document.getElementById(isAdmin ? 'admin-filter-brand' : 'filter-brand').value.trim();
-            const execName = document.getElementById(isAdmin ? 'admin-filter-exec-name' : 'filter-exec-name').value.trim();
-
-            let query = sb.from('reports').select(`id, created_at, status, complaint, suggested, approved, marks, odometer_reading, client_name, client_phone, gdrive_folder_url, customer_feedback_text, customer_feedback_audio, vehicles!inner(id, vehicle_no, vehicle_name, color, engine_no, chassis_no, vehicle_models!inner(brand, model)), users!inner(username)`)
-                .order('created_at', { ascending: false });
-
-            // ... [The existing, complex filter logic from your original function would go here, it is unchanged] ...
-            // For brevity, I am omitting the large block of filter code, as it doesn't need to be changed. Just ensure it's still here.
-
-            if (!isAdmin) {
-                query = query.eq('executive_id', currentUser.id);
-            }
-             if (fromDate) query = query.gte('created_at', `${fromDate}T00:00:00`);
-             if (toDate) query = query.lte('created_at', `${toDate}T23:59:59`);
-
-
-            const reports = await handleSupabaseQuery(query, "Failed to fetch reports.");
-            if (reports === null) return;
-            
-            reportsDataStore = {};
-            reports.forEach(row => { reportsDataStore[row.id] = row; });
-            
-            // --- Dynamically build the table body ---
-            tableBody.innerHTML = '';
-            if (reports.length === 0) {
-                noReportsMsg.classList.remove('hidden');
-                return;
-            }
-            noReportsMsg.classList.add('hidden');
-            
-            reports.forEach(row => {
-                const tr = document.createElement('tr');
-                columnsToRender.forEach(col => {
-                    const td = document.createElement('td');
-                    if (col.className) td.className = col.className;
-                    if (col.key === 'complaint' || col.key === 'suggested' || col.key === 'approved' || col.key === 'feedback_text') {
-                        td.title = formatArrayCell(row[col.key]);
-                    }
-                    td.innerHTML = col.render(row);
-                    tr.appendChild(td);
-                });
-                tableBody.appendChild(tr);
-            });
-        }
+            td.innerHTML = col.render(row);
+            tr.appendChild(td);
+        });
+        tableBody.appendChild(tr);
+    });
+}
 		
         
         function applyAdminReportFilters() { fetchAndPopulateReports(true); }
@@ -2322,14 +2851,15 @@ async function saveComplaints() {
             if (teamError) return showError('Could not verify team data.');
             const teamUserIds = teamUsers.map(u => u.id);
 
-            const { data: existingReport, error: checkError } = await sb
-                .from('reports')
-                .select('id, users ( username )') 
-                .eq('vehicle_id', currentVehicleId)
-                .gte('created_at', today.toISOString())
-                .lt('created_at', tomorrow.toISOString())
-                .in('executive_id', teamUserIds)
-                .maybeSingle();
+			const { data: existingReport, error: checkError } = await sb
+				.from('reports')
+				// CORRECTED LINE: Specify the executive relationship
+				.select('id, users!reports_executive_id_fkey ( username )')
+				.eq('vehicle_id', currentVehicleId)
+				.gte('created_at', today.toISOString())
+				.lt('created_at', tomorrow.toISOString())
+				.in('executive_id', teamUserIds)
+				.maybeSingle();
 
             if (checkError) {
                 console.error("Error checking for existing report:", checkError);
@@ -2570,6 +3100,9 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
     const customerComplaintsList = document.getElementById('customer-complaints-list');
     const customerApprovalList = document.getElementById('customer-approval-list');
 
+    // ADD THIS LINE: Check which tab is currently active.
+    const isPendingTabActive = document.getElementById('tab-btn-pending').classList.contains('active-tab');
+
     // 1. Render editable customer complaints
     customerComplaintsList.innerHTML = '';
     if (complaints.length > 0) {
@@ -2632,24 +3165,56 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
                 ? `<span class="text-xs text-gray-500">(Customer Request)</span>` 
                 : `<span class="text-xs text-blue-600">(New Suggestion)</span>`;
 
-            // START: This section adds the materials input field
             const approvalItemContainer = document.createElement('div');
             approvalItemContainer.className = `p-3 ${bgColor} rounded-lg`;
 
             let materialsInputHtml = '';
-            // Only show the materials input if the customer has responded AND this specific item is checked (approved)
-            if (hasCustomerResponded && isChecked) {
-                 materialsInputHtml = `
-                    <div class="mt-2 pt-2 border-t border-gray-300/50">
-                        <label class="block text-xs font-medium text-gray-600 mb-1">Material Requirements</label>
-                        <input type="text" class="form-input !py-1 !px-2 text-sm w-full" 
-                               value="${materialsValue}"
-                               placeholder="e.g., Oil filter, 4L synthetic oil"
-                               oninput="updateItemMaterials('${sanitizedText}', this.value)">
-                    </div>
-                `;
-            }
-            // END: New section
+            
+            // MODIFIED THIS LINE: Added a check for 'isPendingTabActive'.
+            // The materials input will now only show if the customer has responded AND we are NOT on the pending tab.
+            // MODIFIED THIS LINE: Added a check for 'isPendingTabActive'.
+// The materials input will now only show if the customer has responded AND we are NOT on the pending tab.
+if (hasCustomerResponded && isChecked && !isPendingTabActive) {
+    // Parse existing materials into an array (split by comma or newline)
+    const existingMaterials = (item.materials || '').split(/[,\n]/).map(m => m.trim()).filter(m => m);
+    
+    materialsInputHtml = `
+        <div class="mt-2 pt-2 border-t border-gray-300/50">
+            <div class="flex items-center justify-between mb-1">
+                <label class="block text-xs font-medium text-gray-600">Material Requirements</label>
+                <button type="button" onclick="addMaterialField('${sanitizedText}')" class="p-1 bg-blue-100 text-blue-600 rounded-full hover:bg-blue-200 shrink-0">
+                    <span class="material-symbols-outlined text-sm">add</span>
+                </button>
+            </div>
+            <div id="materials-container-${sanitizedText.replace(/\s+/g, '-')}" class="space-y-1">
+                ${existingMaterials.length > 0 
+                    ? existingMaterials.map((material, index) => `
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-input !py-1 !px-2 text-sm flex-1" 
+                                   value="${material}"
+                                   placeholder="e.g., Oil filter, 4L synthetic oil"
+                                   oninput="updateMaterialsFromInputs('${sanitizedText}')">
+                            <button type="button" onclick="removeMaterialField(this, '${sanitizedText}')" class="p-1 text-red-500 hover:text-red-700 shrink-0">
+                                <span class="material-symbols-outlined text-sm">remove</span>
+                            </button>
+                        </div>
+                      `).join('')
+                    : `
+                        <div class="flex items-center gap-2">
+                            <input type="text" class="form-input !py-1 !px-2 text-sm flex-1" 
+                                   value=""
+                                   placeholder="e.g., Oil filter, 4L synthetic oil"
+                                   oninput="updateMaterialsFromInputs('${sanitizedText}')">
+                            <button type="button" onclick="removeMaterialField(this, '${sanitizedText}')" class="p-1 text-red-500 hover:text-red-700 shrink-0">
+                                <span class="material-symbols-outlined text-sm">remove</span>
+                            </button>
+                        </div>
+                      `
+                }
+            </div>
+        </div>
+    `;
+}
 
             approvalItemContainer.innerHTML = `
                 <label class="flex items-center gap-3 cursor-pointer">
@@ -2673,7 +3238,56 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
     
     recalculateAndUpdateTotal();
 }
+function addMaterialField(itemText) {
+    const sanitizedText = itemText.replace(/\s+/g, '-');
+    const container = document.getElementById(`materials-container-${sanitizedText}`);
+    
+    const newFieldDiv = document.createElement('div');
+    newFieldDiv.className = 'flex items-center gap-2';
+    newFieldDiv.innerHTML = `
+        <input type="text" class="form-input !py-1 !px-2 text-sm flex-1" 
+               value=""
+               placeholder="e.g., Oil filter, 4L synthetic oil"
+               oninput="updateMaterialsFromInputs('${itemText}')">
+        <button type="button" onclick="removeMaterialField(this, '${itemText}')" class="p-1 text-red-500 hover:text-red-700 shrink-0">
+            <span class="material-symbols-outlined text-sm">remove</span>
+        </button>
+    `;
+    
+    container.appendChild(newFieldDiv);
+}
 
+function removeMaterialField(buttonElement, itemText) {
+    const fieldDiv = buttonElement.parentElement;
+    const container = fieldDiv.parentElement;
+    
+    // Don't remove if it's the only field
+    if (container.children.length > 1) {
+        fieldDiv.remove();
+        updateMaterialsFromInputs(itemText);
+    } else {
+        // If it's the last field, just clear its value
+        const input = fieldDiv.querySelector('input');
+        input.value = '';
+        updateMaterialsFromInputs(itemText);
+    }
+}
+
+function updateMaterialsFromInputs(itemText) {
+    const sanitizedText = itemText.replace(/\s+/g, '-');
+    const container = document.getElementById(`materials-container-${sanitizedText}`);
+    
+    if (!container) return;
+    
+    const inputs = container.querySelectorAll('input');
+    const materials = Array.from(inputs)
+        .map(input => input.value.trim())
+        .filter(value => value.length > 0)
+        .join(', ');
+    
+    // Update the item in state
+    updateItemMaterials(itemText, materials);
+}
 
 // FIND AND REPLACE this entire function
         async function renderSettingsToggles() {
@@ -2776,7 +3390,104 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
         }
 		
 		
+async function showQuickAccessModal() {
+    showModal('quick-access-modal');
+    await populateQuickAccessUsers();
+}
 
+async function populateQuickAccessUsers() {
+    const container = document.getElementById('quick-access-users');
+    container.innerHTML = '<p class="text-center text-gray-500">Loading users...</p>';
+
+    const { data: users, error } = await sb
+        .from('users')
+        .select('id, username, role, team')
+        .in('role', ['executive', 'washer'])
+        .order('role', { ascending: true })
+        .order('username', { ascending: true });
+
+    if (error) {
+        container.innerHTML = '<p class="text-center text-red-500">Error loading users</p>';
+        return;
+    }
+
+    container.innerHTML = '';
+
+    if (users.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-500">No executives or washers found</p>';
+        return;
+    }
+
+    const executives = users.filter(u => u.role === 'executive');
+    const washers = users.filter(u => u.role === 'washer');
+
+    if (executives.length > 0) {
+        const execSection = document.createElement('div');
+        execSection.innerHTML = '<h4 class="font-bold text-gray-700 mb-2">Executives</h4>';
+        executives.forEach(user => {
+            const userBtn = document.createElement('button');
+            userBtn.className = 'w-full text-left p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors flex items-center gap-3';
+
+            // Create a separate, styled span for the team name
+            let teamHtml = '';
+            if (user.team) {
+                teamHtml = `<span class="text-sm font-normal text-gray-600 ml-1">(${user.team})</span>`;
+            }
+
+            userBtn.innerHTML = `
+                <span class="material-symbols-outlined text-blue-600">person</span>
+                <div>
+                    <p class="font-semibold text-gray-800">
+                        ${user.username}
+                        ${teamHtml}
+                    </p>
+                    <p class="text-xs text-gray-500 capitalize">${user.role}</p>
+                </div>
+            `;
+            userBtn.onclick = () => quickAccessUser(user);
+            execSection.appendChild(userBtn);
+        });
+        container.appendChild(execSection);
+    }
+
+    if (washers.length > 0) {
+        const washerSection = document.createElement('div');
+        washerSection.innerHTML = '<h4 class="font-bold text-gray-700 mb-2 mt-4">Washers</h4>';
+        washers.forEach(user => {
+            const userBtn = document.createElement('button');
+            userBtn.className = 'w-full text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg transition-colors flex items-center gap-3';
+            userBtn.innerHTML = `
+                <span class="material-symbols-outlined text-green-600">local_car_wash</span>
+                <div>
+                    <p class="font-semibold text-gray-800">${user.username}</p>
+                    <p class="text-xs text-gray-500 capitalize">${user.role}</p>
+                </div>
+            `;
+            userBtn.onclick = () => quickAccessUser(user);
+            washerSection.appendChild(userBtn);
+        });
+        container.appendChild(washerSection);
+    }
+}
+
+async function quickAccessUser(user) {
+    sessionStorage.setItem('originalAdmin', JSON.stringify(currentUser));
+    currentUser = user;
+    sessionStorage.setItem('currentUser', JSON.stringify(currentUser));
+    hideModal('quick-access-modal');
+    
+    if (user.role === 'executive') {
+        document.getElementById('profile-username').textContent = user.username;
+        document.getElementById('profile-role').textContent = user.role;
+        await fetchAndApplyAppSettings();
+        showExecutiveScreen('job-card-screen');
+        showSuccessMessage(`Switched to executive: ${user.username}`);
+    } else if (user.role === 'washer') {
+        showScreen('washer-screen');
+        populateWashList();
+        showSuccessMessage(`Switched to washer: ${user.username}`);
+    }
+}
         // ADD THIS NEW FUNCTION
         async function updateReportColumns() {
             const checklist = document.getElementById('report-columns-checklist');
@@ -2879,57 +3590,55 @@ function renderSuggestions(complaints = [], suggestions = [], approved = []) {
 
 
 
+
+
+
+// Replace your showUpdateTab function with this simpler version
+function showUpdateTab(tabName) {
+    document.querySelectorAll('#update-tab-container .tab-button').forEach(btn => btn.classList.remove('active-tab'));
+    document.querySelectorAll('#update-tab-container .tab-panel').forEach(panel => panel.classList.add('hidden'));
+
+    const tabMap = {
+        'pending': { btn: 'tab-btn-pending', panel: 'pending-jobs-panel', func: populateNotStartedJobs },
+        'awaiting': { btn: 'tab-btn-awaiting', panel: 'awaiting-response-panel', func: populateAwaitingResponseJobs },
+        'responses': { btn: 'tab-btn-responses', panel: 'responses-received-panel', func: populateCustomerResponseJobs }
+    };
+
+    if (tabMap[tabName]) {
+        document.getElementById(tabMap[tabName].btn).classList.add('active-tab');
+        document.getElementById(tabMap[tabName].panel).classList.remove('hidden');
+        tabMap[tabName].func();
+    }
+}
+
+// Replace your saveVehicleUpdate function to revert to the 'Ongoing' status
 async function saveVehicleUpdate(shouldReset = true) {
-            if (!currentReportId) return showError('No report selected for update.');
+    if (!currentReportId) return showError('No report selected for update.');
 
-            const deliveryDate = document.getElementById('delivery-date').value;
-            if (!deliveryDate) return showError('Please select an expected delivery date.');
+    const deliveryDate = document.getElementById('delivery-date').value;
+    if (!deliveryDate) return showError('Please select an expected delivery date.');
 
-            const today = new Date();
-            today.setHours(0, 0, 0, 0); 
-            const selectedDate = new Date(deliveryDate);
-            selectedDate.setMinutes(selectedDate.getMinutes() + selectedDate.getTimezoneOffset());
+    const approvedItems = [];
+    document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
+        try { approvedItems.push(JSON.parse(checkbox.value)); } catch (e) {}
+    });
 
-            if (selectedDate < today) {
-                return showError('The delivery date cannot be in the past. Please select today or a future date.');
-            }
-            
-            const approvedItems = [];
-            document.querySelectorAll('#customer-approval-list input[type="checkbox"]:checked').forEach(checkbox => {
-                try {
-                    approvedItems.push(JSON.parse(checkbox.value));
-                } catch (e) { console.error("Could not parse approved item from checkbox", checkbox.value); }
-            });
+    const allItemsForApproval = [...originalComplaintsForUpdate, ...newSuggestions];
 
-            const allItemsForApproval = [
-                ...originalComplaintsForUpdate,
-                ...newSuggestions
-            ];
+    const updateData = {
+        complaint: JSON.stringify(originalComplaintsForUpdate),
+        suggested: JSON.stringify(allItemsForApproval),
+        approved: JSON.stringify(approvedItems),
+        status: 'Ongoing', // Reverted to 'Ongoing'
+        expected_delivery: deliveryDate
+    };
+    
+    const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
+    if (error) return showError(`Failed to save update: ${error.message}`);
 
-            const updateData = {
-                complaint: JSON.stringify(originalComplaintsForUpdate),
-                suggested: JSON.stringify(allItemsForApproval),
-                approved: JSON.stringify(approvedItems),
-                expected_delivery: deliveryDate,
-                status: 'Ongoing'
-            };
-
-            const { error } = await sb.from('reports').update(updateData).eq('id', currentReportId);
-            if (error) return showError(`Failed to save update: ${error.message}`);
-
-            showSuccessMessage('Update saved successfully!');
-            
-            if (shouldReset) {
-                // THIS IS THE NEW LOGIC
-                if (document.getElementById('tab-btn-responses').classList.contains('active-tab')) {
-                    // If we saved from the "Responses Received" tab, navigate to the "Close" page.
-                    showExecutiveScreen('due-date-screen');
-                } else {
-                    // Otherwise, just reset the current screen.
-                    resetVehicleUpdateScreen();
-                }
-            }
-        }
+    showSuccessMessage('Update saved successfully!');
+    resetVehicleUpdateScreen();
+}
 
 
                 
@@ -3075,24 +3784,8 @@ async function sendApprovalLink() {
             });
         }
 
-        function showUpdateTab(tabName) {
-            document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active-tab'));
-            document.querySelectorAll('.tab-panel').forEach(panel => panel.classList.add('hidden'));
 
-            if (tabName === 'pending') {
-                document.getElementById('tab-btn-pending').classList.add('active-tab');
-                document.getElementById('pending-jobs-panel').classList.remove('hidden');
-                populateNotStartedJobs();
-            } else if (tabName === 'awaiting') {
-                document.getElementById('tab-btn-awaiting').classList.add('active-tab');
-                document.getElementById('awaiting-response-panel').classList.remove('hidden');
-                populateAwaitingResponseJobs();
-            } else if (tabName === 'responses') {
-                document.getElementById('tab-btn-responses').classList.add('active-tab');
-                document.getElementById('responses-received-panel').classList.remove('hidden');
-                populateCustomerResponseJobs();
-            }
-        }
+
         async function populateCustomerResponseJobs() {
             const listContainer = document.getElementById('customer-response-list');
             const noJobsMsg = document.getElementById('no-customer-response-message');
@@ -3682,38 +4375,42 @@ function resetVehicleUpdateScreen() {
         function showScreen(screenId) { document.querySelectorAll('.screen').forEach(s => s.classList.remove('active-screen')); document.getElementById(screenId).classList.add('active-screen'); }
         
 function showAdminScreen(screenId) {
-            document.querySelectorAll('#admin-screens .admin-screen').forEach(s => s.style.display = 'none');
-            document.getElementById(screenId).style.display = 'block';
-            
-            if (screenId === 'admin-vehicle-management-screen') renderVehicleModelList();
-            if (screenId === 'admin-reports-screen') fetchAndPopulateReports(true);
-            if (screenId === 'admin-analytics-screen') { populateAnalyticsFilters(); renderAnalytics(); }
-            if (screenId === 'admin-executive-management-screen') renderUserList('executive');
-            if (screenId === 'admin-admin-management-screen') renderUserList('admin');
-            if (screenId === 'admin-washer-management-screen') renderUserList('washer'); // ADDED
-            if (screenId === 'admin-settings-screen') renderSettingsToggles();
-            
-            showScreen('admin-screens');
-        }
+    document.querySelectorAll('#admin-screens .admin-screen').forEach(s => s.style.display = 'none');
+    document.getElementById(screenId).style.display = 'block';
+    
+    if (screenId === 'admin-vehicle-management-screen') renderVehicleModelList();
+    if (screenId === 'admin-reports-screen') fetchAndPopulateReports(true);
+    if (screenId === 'admin-analytics-screen') { populateAnalyticsFilters(); renderAnalytics(); }
+    if (screenId === 'admin-executive-management-screen') renderUserList('executive');
+    if (screenId === 'admin-admin-management-screen') renderUserList('admin');
+    if (screenId === 'admin-washer-management-screen') renderUserList('washer');
+    if (screenId === 'admin-inspector-management-screen') renderUserList('inspector'); // ADDED THIS LINE
+    if (screenId === 'admin-settings-screen') renderSettingsToggles();
+    
+    showScreen('admin-screens');
+}
 
 
+// Replace the existing function with this complete version
 function showExecutiveScreen(screenId) {
-            document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
-            document.getElementById(screenId).style.display = 'block';
-            setActiveNav(screenId);
+    document.querySelectorAll('#executive-screens .executive-screen').forEach(s => s.style.display = 'none');
+    document.getElementById(screenId).style.display = 'block';
+    setActiveNav(screenId);
 
-            // THE FIX IS ON THE NEXT LINE
-            if (screenId === 'report-screen') clearReportFilters(); // This now clears filters every time the page is viewed.
-            if (screenId === 'due-date-screen') showCloseTab('wash-pending'); 
-            if (screenId === 'job-card-screen') {
-                resetJobCardState();
-            }
-            if (screenId === 'vehicle-update-screen') {
-                resetVehicleUpdateScreen();
-            }
+    if (screenId === 'report-screen') fetchAndPopulateReports(false);
+    
+    // THE FIX: The default tab is now 'ready-to-close'
+    if (screenId === 'due-date-screen') showCloseTab('ready-to-close'); 
+    
+    if (screenId === 'job-card-screen') {
+        resetJobCardState();
+    }
+    if (screenId === 'vehicle-update-screen') {
+        resetVehicleUpdateScreen();
+    }
 
-            showScreen('executive-screens');
-        }
+    showScreen('executive-screens');
+}
 
         function setActiveNav(targetId) {
             const headerTitle = document.getElementById('executive-header-title');
@@ -3989,7 +4686,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Make this async
             checkCanvas = document.getElementById("checkCanvas");
             if (carImage && damageCanvas && checkCanvas) {
                 damageCtx = damageCanvas.getContext("2d");
-                checkCtx = checkCanvas.getContext("2d");
+                checkCtx = checkCanvas.getContext("2d", { willReadFrequently: true });
                 carImage.onload = resizeCanvas;
                 window.addEventListener("resize", resizeCanvas);
                 damageCanvas.addEventListener("click", (e) => {
@@ -4023,7 +4720,7 @@ document.addEventListener('DOMContentLoaded', async () => { // Make this async
 
         function printJobCard(reportData) {
             document.getElementById('print-report-date').textContent = new Date(reportData.created_at).toLocaleString();
-            document.getElementById('print-executive-name').textContent = reportData.users.username || 'N/A';
+            document.getElementById('print-executive-name').textContent = reportData.executive?.username || 'N/A';
             document.getElementById('print-vehicle-no').textContent = reportData.vehicles.vehicle_no || 'N/A';
             document.getElementById('print-vehicle-name').textContent = `${reportData.vehicles.vehicle_models.brand} ${reportData.vehicles.vehicle_models.model}`;
             document.getElementById('print-engine-chassis').textContent = `${reportData.vehicles.engine_no || 'N/A'} / ${reportData.vehicles.chassis_no || 'N/A'}`;
