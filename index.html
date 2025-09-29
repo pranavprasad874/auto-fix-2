@@ -1945,11 +1945,10 @@ async function populateReadyToCloseJobs() {
 
     reports.forEach(report => {
         const card = document.createElement('div');
-        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+        // THE FIX: Added optional chaining (?.) to safely access brand and model
+        const brandAndModel = `${report.vehicles.vehicle_models?.brand || ''} ${report.vehicles.vehicle_models?.model || ''}`.trim();
         
-        // This class stacks the card's content vertically on mobile (flex-col)
         card.className = 'p-4 border border-gray-200 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
-        
         card.innerHTML = `
             <div class="w-full text-left">
                 <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
@@ -2030,6 +2029,7 @@ function showInspectionDetails(report) {
 
 
 // Add this new function anywhere in your <script> tag
+// REPLACE this function
 async function populateInspectionPendingJobs() {
     if (!currentUser) return;
     const rejectedList = document.getElementById('rejected-jobs-list');
@@ -2041,12 +2041,11 @@ async function populateInspectionPendingJobs() {
         return console.error("Required elements for inspection tab are missing.");
     }
 
-    rejectedList.innerHTML = ''; // Safely clear only the lists
+    rejectedList.innerHTML = '';
     pendingList.innerHTML = '';
     noRejectedMsg.classList.add('hidden');
     noPendingMsg.classList.add('hidden');
 
-    // --- Query for REJECTED Jobs ---
     const { data: rejectedReports, error: rejectedError } = await sb.from('reports')
         .select(`id, inspection_remarks, vehicles!inner(vehicle_no, vehicle_models(brand, model)), inspector:inspector_id(username)`)
         .eq('executive_id', currentUser.id)
@@ -2057,7 +2056,8 @@ async function populateInspectionPendingJobs() {
     if (rejectedReports && rejectedReports.length > 0) {
         rejectedReports.forEach(report => {
             const card = document.createElement('div');
-            const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+            // THE FIX: Added optional chaining (?.)
+            const brandAndModel = `${report.vehicles.vehicle_models?.brand || ''} ${report.vehicles.vehicle_models?.model || ''}`.trim();
             card.className = 'p-4 border border-red-300 bg-red-50 rounded-lg';
             card.innerHTML = `
                 <div class="flex justify-between items-start">
@@ -2080,7 +2080,6 @@ async function populateInspectionPendingJobs() {
         noRejectedMsg.classList.remove('hidden');
     }
 
-    // --- Query for PENDING Inspection Jobs ---
     const { data: pendingReports, error: pendingError } = await sb.from('reports')
         .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
         .eq('executive_id', currentUser.id)
@@ -2091,7 +2090,8 @@ async function populateInspectionPendingJobs() {
     if (pendingReports && pendingReports.length > 0) {
         pendingReports.forEach(report => {
             const card = document.createElement('div');
-            const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+            // THE FIX: Added optional chaining (?.)
+            const brandAndModel = `${report.vehicles.vehicle_models?.brand || ''} ${report.vehicles.vehicle_models?.model || ''}`.trim();
             card.className = 'p-4 border border-gray-200 bg-gray-50 rounded-lg';
             card.innerHTML = `
                 <div class="flex justify-between items-center">
@@ -2134,8 +2134,9 @@ async function populateInspectionQueue() {
     listContainer.innerHTML = '';
     noJobsMsg.classList.add('hidden');
 
+    // THE FIX: Added 'inspection_remarks' to the query
     const query = sb.from('reports')
-        .select(`id, complaint, suggested, vehicles!inner(vehicle_no, vehicle_name), executive:executive_id(username)`)
+        .select(`id, complaint, suggested, inspection_remarks, vehicles!inner(vehicle_no, vehicle_name), executive:executive_id(username)`)
         .eq('status', 'pending_inspection')
         .order('created_at', { ascending: true });
     
@@ -2149,18 +2150,25 @@ async function populateInspectionQueue() {
         const card = document.createElement('div');
         card.className = 'p-4 border border-gray-200 rounded-lg flex justify-between items-center';
 
+        // THE FIX: Check for remarks and create the badge if they exist
+        const isReinspection = report.inspection_remarks && report.inspection_remarks.trim() !== '';
+        const reinspectionBadge = isReinspection 
+            ? '<span class="ml-2 text-xs font-semibold text-orange-800 bg-orange-200 px-2 py-0.5 rounded-full">Re-inspection</span>' 
+            : '';
+
         const infoDiv = document.createElement('div');
         infoDiv.innerHTML = `
-            <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+            <div class="flex items-center">
+                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                ${reinspectionBadge}
+            </div>
             <p class="text-sm text-gray-600">${report.vehicles.vehicle_name || ''}</p>
             <p class="text-xs text-gray-500 mt-1">From: ${report.executive?.username || 'N/A'}</p>
         `;
 
         const viewButton = document.createElement('button');
-        viewButton.className = 'btn-primary !w-auto !py-2 !px-4';
+        viewButton.className = 'btn-primary !w-auto !py-2 !px-4 flex-shrink-0';
         viewButton.textContent = 'View Details';
-        
-        // THE FIX: Attach the event listener directly, passing the object safely
         viewButton.onclick = () => showInspectionDetails(report);
 
         card.appendChild(infoDiv);
@@ -2198,24 +2206,27 @@ function handleInspection(reportId, outcome, vehicleNo) {
 
 
 // Replace your existing confirmInspection function with this one
-// This function runs when the INSPECTOR clicks Approve/Reject
 // REPLACE this function
 async function confirmInspection(reportId, outcome) {
     if (!currentUser) return showError('Session expired. Please log in.');
     
-    const remarks = document.getElementById('inspection-remarks-input').value.trim();
+    let remarks = document.getElementById('inspection-remarks-input').value.trim();
     
-    // MODIFIED LOGIC: Only require remarks on rejection
     if (outcome === 'rejected' && !remarks) {
         return showError('Remarks are required when rejecting a job.');
     }
     
     const finalStatus = outcome === 'inspection_approved' ? 'inspection_approved' : 'rejected';
 
+    // THE FIX: If approved, clear out any old rejection remarks for data cleanliness
+    if (outcome === 'inspection_approved') {
+        remarks = ''; // Clear remarks on approval
+    }
+
     const updateData = {
         status: finalStatus,
         inspector_id: currentUser.id,
-        inspection_remarks: remarks, // Will be empty string if not provided on approval
+        inspection_remarks: remarks,
         inspection_date: new Date().toISOString()
     };
     
@@ -2230,7 +2241,7 @@ async function confirmInspection(reportId, outcome) {
 
 
 
-// Replace your existing populateWashPendingJobs function with this one
+// REPLACE this function
 // REPLACE this function
 async function populateWashPendingJobs() {
     if (!currentUser) return;
@@ -2243,9 +2254,9 @@ async function populateWashPendingJobs() {
     noJobsMsg.classList.add('hidden');
 
     const { data: reports, error } = await sb.from('reports')
-        .select(`id, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
+        .select(`id, status, vehicles!inner(vehicle_no, vehicle_models(brand, model))`)
         .eq('executive_id', currentUser.id)
-        .eq('status', 'inspection_approved');
+        .in('status', ['inspection_approved', 'Sent To Wash']);
 
     if (error) return showError('Could not fetch jobs for wash.');
 
@@ -2256,43 +2267,53 @@ async function populateWashPendingJobs() {
 
     reports.forEach(report => {
         const card = document.createElement('div');
-        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
+        // THE FIX: Added optional chaining (?.)
+        const brandAndModel = `${report.vehicles.vehicle_models?.brand || ''} ${report.vehicles.vehicle_models?.model || ''}`.trim();
         
-        // This class stacks the card's content vertically on mobile (flex-col)
-        card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
-
-        card.innerHTML = `
-            <div class="w-full text-left">
-                <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
-                <p class="text-sm text-gray-600">${brandAndModel}</p>
-            </div>
-            <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto flex-shrink-0">
-                <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
-                    Send for Wash
-                </button>
-                <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
-                    Skip & Complete
-                </button>
-            </div>
-        `;
+        if (report.status === 'inspection_approved') {
+            card.className = 'p-4 border border-yellow-300 bg-yellow-50 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
+            card.innerHTML = `
+                <div class="w-full text-left">
+                    <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                    <p class="text-sm text-gray-600">${brandAndModel}</p>
+                </div>
+                <div class="flex flex-col sm:flex-row items-center gap-2 w-full sm:w-auto flex-shrink-0">
+                    <button onclick="updateJobStatus(${report.id}, 'Sent To Wash', '${report.vehicles.vehicle_no}')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
+                        Send for Wash
+                    </button>
+                    <button onclick="markCompletedDirectly(${report.id}, '${report.vehicles.vehicle_no}')" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-1.5 px-3 rounded text-sm w-full sm:w-auto">
+                        Skip & Complete
+                    </button>
+                </div>
+            `;
+        } else {
+            card.className = 'p-4 border border-blue-300 bg-blue-50 rounded-lg flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3';
+            card.innerHTML = `
+                <div class="w-full text-left">
+                    <p class="font-bold text-gray-800">${report.vehicles.vehicle_no}</p>
+                    <p class="text-sm text-gray-600">${brandAndModel}</p>
+                </div>
+                <div class="w-full sm:w-auto text-left sm:text-right">
+                     <p class="text-sm font-semibold text-blue-700">Currently in Wash</p>
+                </div>
+            `;
+        }
         listContainer.appendChild(card);
     });
 }
 		
 		
         
-// Replace the existing function with this complete version
-// Replace the existing function with this complete version
+// REPLACE this function
 async function populateCompletedWashJobs() {
     if (!currentUser) return;
     
-    // THE FIX: Target the new, safe list container and the message element
     const listContainer = document.getElementById('complete-list');
     const noJobsMsg = document.getElementById('no-complete-message');
     
     if(!listContainer || !noJobsMsg) return console.error("Complete tab elements not found");
 
-    listContainer.innerHTML = ''; // Safely clear only the list
+    listContainer.innerHTML = '';
     noJobsMsg.classList.add('hidden');
     
     const { data: reports, error } = await sb.from('reports')
@@ -2310,8 +2331,9 @@ async function populateCompletedWashJobs() {
 
     reports.forEach(report => {
         const card = document.createElement('div');
-        const brandAndModel = `${report.vehicles.vehicle_models.brand || ''} ${report.vehicles.vehicle_models.model || ''}`.trim();
-        // THE FIX: The class 'job-card-item' is no longer needed
+        // THE FIX: Added optional chaining (?.)
+        const brandAndModel = `${report.vehicles.vehicle_models?.brand || ''} ${report.vehicles.vehicle_models?.model || ''}`.trim();
+        
         card.className = 'p-4 border border-green-300 bg-green-50 rounded-lg flex justify-between items-center';
         card.innerHTML = `
             <div>
@@ -2344,19 +2366,46 @@ async function populateCompletedWashJobs() {
         }
 		
 		
+function normalizeName(str) {
+    if (!str) return '';
+    // Replace hyphens/multiple spaces with a single space, then convert to Title Case
+    return str.trim()
+              .replace(/[\s-]+/g, ' ')
+              .toLowerCase()
+              .split(' ')
+              .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ');
+}
         
-        async function addVehicleModel() {
-            const brand = document.getElementById('new-brand-admin').value.trim();
-            const model = document.getElementById('new-model-admin').value.trim();
-            if (!brand || !model) return showError('Brand and model are required.');
-
-            const { error } = await sb.from('vehicle_models').insert({ brand, model });
-            if (error) return showError(`Could not add model: ${error.message}`);
-            
-            document.getElementById('add-vehicle-model-form').reset();
-            showSuccessMessage("Vehicle model added.");
-            renderVehicleModelList();
-        }
+async function addVehicleModel() {
+    // Use your robust normalizeName function to standardize the input
+    const brand = normalizeName(document.getElementById('new-brand-admin').value);
+    const model = normalizeName(document.getElementById('new-model-admin').value);
+    if (!brand || !model) {
+        return showError('Brand and model are required.');
+    }
+    // Check for duplicates before inserting
+    const { data: existing, error: checkError } = await sb
+        .from('vehicle_models')
+        .select('id')
+        .eq('brand', brand)
+        .eq('model', model)
+        .maybeSingle();
+    if (checkError) {
+        return showError(`Error checking for duplicates: ${checkError.message}`);
+    }
+    if (existing) {
+        return showError(`'${brand} - ${model}' already exists in the database.`);
+    }
+    // Only insert if no duplicate was found
+    const { error } = await sb.from('vehicle_models').insert({ brand, model });
+    if (error) {
+        return showError(`Could not add model: ${error.message}`);
+    }
+    document.getElementById('add-vehicle-model-form').reset();
+    showSuccessMessage("Vehicle model added successfully.");
+    renderVehicleModelList();
+}
 
         // --- ADMIN: USER MANAGEMENT ---
 async function renderUserList(role) {
@@ -2620,7 +2669,8 @@ async function fetchAndPopulateReports(isAdmin = false) {
         }
         
         // --- EXECUTIVE: JOB CARD ---
-        async function searchVehicle() {
+// REPLACE this entire function
+async function searchVehicle() {
     const rawVehicleNumber = document.getElementById('search-vehicle-number').value;
     const vehicleNumber = normalizeVehicleNumber(rawVehicleNumber);
     hideAllSections();
@@ -2636,46 +2686,55 @@ async function fetchAndPopulateReports(isAdmin = false) {
         `)
         .eq('vehicle_no', vehicleNumber)
         .single();
+
     const odometerWrapper = document.getElementById('odometer-display-wrapper');
     const clientNameWrapper = document.getElementById('client-name-wrapper');
     const clientPhoneWrapper = document.getElementById('client-phone-wrapper');
-    if (data) {
-        // 1. Fetch the odometer reading from the most recently created report for this vehicle.
+
+    if (data) { // Vehicle Found
         const { data: latestReportData, error: latestReportError } = await sb
             .from('reports')
             .select('odometer_reading')
             .eq('vehicle_id', data.id)
-            // --- THIS IS THE CORRECTED LINE ---
-            .order('created_at', { ascending: false }) // Sort by date to get the most recent report first
+            .order('created_at', { ascending: false })
             .limit(1)
             .maybeSingle();
+
         if (latestReportError) {
             console.error("Error fetching latest odometer:", latestReportError);
         }
-        // 2. Use the reading from the latest report, or fall back to the vehicle's default reading.
+
         const latestOdometer = latestReportData?.odometer_reading || data.odometer;
-        // 3. Update the global state with this new, latest odometer reading.
         currentVehicleId = data.id;
         currentOdometer = latestOdometer;
         originalClientName = data.client_name;
         originalClientPhone = data.client_phone;
+
         document.getElementById('detail-vehicle-number').textContent = data.vehicle_no;
-        document.getElementById('detail-brand').textContent = data.vehicle_models.brand;
-        document.getElementById('detail-model').textContent = data.vehicle_models.model;
-        document.getElementById('detail-fuel-type').textContent = data.fuel_type;
+        
+        // --- START OF FIX ---
+        // Safely access brand and model using optional chaining (?.)
+        // This prevents the "Cannot read properties of null" error.
+        document.getElementById('detail-brand').textContent = data.vehicle_models?.brand || 'N/A';
+        document.getElementById('detail-model').textContent = data.vehicle_models?.model || 'N/A';
+        // --- END OF FIX ---
+
+        document.getElementById('detail-fuel-type').textContent = data.fuel_type || 'N/A';
         document.getElementById('detail-vehicle-name').textContent = data.vehicle_name || 'N/A';
         document.getElementById('detail-color').textContent = data.color || 'N/A';
         document.getElementById('detail-engine-no').textContent = data.engine_no || 'N/A';
         document.getElementById('detail-chassis-no').textContent = data.chassis_no || 'N/A';
+
         clientNameWrapper.innerHTML = `<input type="text" id="detail-client-name-input" class="form-input" value="${data.client_name || ''}">`;
         clientPhoneWrapper.innerHTML = `<input type="tel" id="detail-client-phone-input" class="form-input" value="${data.client_phone || ''}" maxlength="10" oninput="this.value = this.value.replace(/[^0-9]/g, '');">`;
-        // 4. Populate the input field with the determined latest odometer reading.
         odometerWrapper.innerHTML = `<input type="number" id="detail-odometer-input" class="form-input" value="${latestOdometer || 0}">`;
+        
         document.getElementById('detail-odometer-input').addEventListener('blur', checkOdometer);
         vehicleDetailsSection.classList.remove('hidden');
         newComplaintSection.classList.remove('hidden');
         setTimeout(resizeCanvas, 50);
-    } else {
+
+    } else { // Vehicle Not Found
         currentVehicleId = null;
         currentOdometer = 0;
         clientNameWrapper.innerHTML = `<p id="detail-client-name" class="font-semibold"></p>`;
@@ -2686,6 +2745,8 @@ async function fetchAndPopulateReports(isAdmin = false) {
         createVehicleSection.classList.remove('hidden');
     }
 }
+
+
         async function populateExecutiveVehicleDropdowns() {
             if (vehicleModelsCache.length === 0) { 
                 const { data, error } = await sb.from('vehicle_models').select('*');
@@ -2740,51 +2801,51 @@ async function fetchAndPopulateReports(isAdmin = false) {
     }
 }
         
+// REPLACE this function
 async function createVehicle() {
-            const showFullForm = appSettings.show_full_vehicle_form === true;
+    const showFullForm = appSettings.show_full_vehicle_form === true;
 
-            const newVehicle = {
-                vehicle_no: normalizeVehicleNumber(document.getElementById('new-vehicle-number').value),
-                client_phone: document.getElementById('new-client-phone').value.trim()
-            };
+    // THE FIX: Client Name is now collected regardless of the form mode
+    const newVehicle = {
+        vehicle_no: normalizeVehicleNumber(document.getElementById('new-vehicle-number').value),
+        client_phone: document.getElementById('new-client-phone').value.trim(),
+        client_name: document.getElementById('new-client-name').value.trim()
+    };
 
-            if (showFullForm) {
-                Object.assign(newVehicle, {
-                    model_id: document.getElementById('new-vehicle-model-exec').value,
-                    fuel_type: document.getElementById('new-fuel-type').value,
-                    odometer: document.getElementById('new-odometer').value,
-                    vehicle_name: document.getElementById('new-vehicle-name').value.trim(),
-                    color: document.getElementById('new-color').value.trim(),
-                    engine_no: document.getElementById('new-engine-no').value.trim(),
-                    chassis_no: document.getElementById('new-chassis-no').value.trim(),
-                    client_name: document.getElementById('new-client-name').value.trim(),
-                });
+    // Validation for essential customer info
+    if (!newVehicle.client_name) return showError('Client Name is required.');
+    if (!/^\d{10}$/.test(newVehicle.client_phone)) {
+        return showError('Please enter a valid 10-digit phone number.');
+    }
 
-                if (!newVehicle.model_id || !newVehicle.fuel_type || !newVehicle.odometer || !newVehicle.client_name || !newVehicle.engine_no || !newVehicle.chassis_no) {
-                    return showError('Please fill all mandatory vehicle details.');
-                }
-            } else {
-                // THIS IS THE FIX: Provide a default value for the required odometer field
-                // when using the simplified form.
-                newVehicle.odometer = 0;
-            }
-
-            if (!/^\d{10}$/.test(newVehicle.client_phone)) {
-                return showError('Please enter a valid 10-digit phone number.');
-            }
-
-            const { data, error } = await sb.from('vehicles').insert(newVehicle).select().single();
-            if (error) {
-                // Pass the actual error object for better console logging
-                return showError(`Failed to create vehicle: ${error.message}`, error);
-            }
-            
-            currentVehicleId = data.id;
-            document.getElementById('create-vehicle-form').reset();
-            createVehicleSection.classList.add('hidden');
-            showSuccessMessage('Vehicle created successfully!');
-            searchVehicle();
+    if (showFullForm) {
+        Object.assign(newVehicle, {
+            model_id: document.getElementById('new-vehicle-model-exec').value,
+            fuel_type: document.getElementById('new-fuel-type').value,
+            odometer: document.getElementById('new-odometer').value,
+            vehicle_name: document.getElementById('new-vehicle-name').value.trim(),
+            color: document.getElementById('new-color').value.trim(),
+            engine_no: document.getElementById('new-engine-no').value.trim(),
+            chassis_no: document.getElementById('new-chassis-no').value.trim(),
+        });
+        if (!newVehicle.model_id || !newVehicle.fuel_type || !newVehicle.odometer || !newVehicle.engine_no || !newVehicle.chassis_no) {
+            return showError('Please fill all mandatory vehicle details.');
         }
+    } else {
+        newVehicle.odometer = 0;
+    }
+
+    const { data, error } = await sb.from('vehicles').insert(newVehicle).select().single();
+    if (error) {
+        return showError(`Failed to create vehicle: ${error.message}`, error);
+    }
+    
+    currentVehicleId = data.id;
+    document.getElementById('create-vehicle-form').reset();
+    createVehicleSection.classList.add('hidden');
+    showSuccessMessage('Vehicle created successfully!');
+    searchVehicle();
+}
 
         // This version adds a complaint with a default amount of 0.
 function addComplaint() {
@@ -3587,32 +3648,35 @@ async function quickAccessUser(user) {
             applyFeatureToggles();
         }
 
-        function applyFeatureToggles() {
-            const scannerButton = document.querySelector("button[onclick=\"document.getElementById('image-upload-input').click()\"]");
-            if (scannerButton) {
-                scannerButton.style.display = appSettings.enable_vehicle_scanner ? 'flex' : 'none';
-            }
 
-            const form = document.getElementById('create-vehicle-form');
-            if (form) {
-                const fieldsToToggle = [
-                    'new-vehicle-name', 'new-vehicle-brand-exec', 'new-vehicle-model-exec', 
-                    'new-color', 'new-fuel-type', 'new-engine-no', 'new-chassis-no', 
-                    'new-odometer', 'new-client-name'
-                ];
-                const showFullForm = appSettings.show_full_vehicle_form === true;
-                fieldsToToggle.forEach(fieldId => {
-                    const input = document.getElementById(fieldId);
-                    const wrapper = input.parentElement;
-                    if (wrapper) {
-                        wrapper.style.display = showFullForm ? 'block' : 'none';
-                    }
-                    if (input) {
-                        input.required = showFullForm;
-                    }
-                });
+// REPLACE this function
+function applyFeatureToggles() {
+    const scannerButton = document.querySelector("button[onclick=\"document.getElementById('image-upload-input').click()\"]");
+    if (scannerButton) {
+        scannerButton.style.display = appSettings.enable_vehicle_scanner ? 'flex' : 'none';
+    }
+
+    const form = document.getElementById('create-vehicle-form');
+    if (form) {
+        // THE FIX: 'new-client-name' has been removed from this list so it's never hidden.
+        const fieldsToToggle = [
+            'new-vehicle-name', 'new-vehicle-brand-exec', 'new-vehicle-model-exec', 
+            'new-color', 'new-fuel-type', 'new-engine-no', 'new-chassis-no', 
+            'new-odometer'
+        ];
+        const showFullForm = appSettings.show_full_vehicle_form === true;
+        fieldsToToggle.forEach(fieldId => {
+            const input = document.getElementById(fieldId);
+            const wrapper = input.parentElement;
+            if (wrapper) {
+                wrapper.style.display = showFullForm ? 'block' : 'none';
             }
-        }
+            if (input) {
+                input.required = showFullForm;
+            }
+        });
+    }
+}
 
 
 
